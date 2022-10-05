@@ -971,7 +971,7 @@ cat >site.yml<<"EOF"
     become: yes
     become_user: root
     copy:
-      dest: /usr/local/etc/consul/agent.json
+      dest: /usr/local/etc/consul.d/agent.json
       content: |
         "bind_addr": "{{ minio1_ip_address }}",
         "server": false,
@@ -1000,7 +1000,7 @@ cat >site.yml<<"EOF"
 
   - name: Set consul agent.json permissions
     ansible.builtin.file:
-      path: "/usr/local/etc/consul/agent.json"
+      path: "/usr/local/etc/consul.d/agent.json"
       mode: '0644'
       owner: consul
       group: wheel
@@ -1510,7 +1510,7 @@ cat >site.yml<<"EOF"
     become: yes
     become_user: root
     copy:
-      dest: /usr/local/etc/consul/agent.json
+      dest: /usr/local/etc/consul.d/agent.json
       content: |
         "bind_addr": "{{ minio2_ip_address }}",
         "server": false,
@@ -1539,7 +1539,7 @@ cat >site.yml<<"EOF"
 
   - name: Set consul agent.json permissions
     ansible.builtin.file:
-      path: "/usr/local/etc/consul/agent.json"
+      path: "/usr/local/etc/consul.d/agent.json"
       mode: '0644'
       owner: consul
       group: wheel
