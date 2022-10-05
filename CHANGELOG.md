@@ -1,3 +1,10 @@
+0.9
+
+* Update README
+* Formatting, allowing long lines
+
+---
+
 0.8
 
 * Increment added port forward by one to not clash with minio2
