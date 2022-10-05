@@ -1,11 +1,13 @@
 # Introduction
 `minio-sampler` (aka `minsampler`) borrows heavily from [potman](https://github.com/bsdpot/potman), [minio-incinerator](https://github.com/bretton/minio-incinerator/), `clusterfurnace` and `cephsmelter` to build a virtualbox minio cluster .
 
-Do not run in production! This is a testing environment to show minio running on FreeBSD, with Consul, and the Beast-of-Argh monitoring solution alongside.
+Do not run in production! 
+
+This is a testing environment to show `minio` running on FreeBSD, with `consul`, `nomad`, and the Beast-of-Argh one-pot monitoring solution providing `prometheus`, `grafana`, `loki`, `alertmanager`, plus a `nextcloud` nomad image, configured to use `minio` S3 as file storage, and a `mariadb` pot image for the `nextcloud` database.
 
 # Outline
-This will bring up 2 minio servers, configured for erasure coding, with a web interface:
-* minio1 (4CPU, 4GB, 4 attached disks, nginx reverse proxy host, consul jail, beast-of-argh jail)
+This will bring up 2 minio servers:
+* minio1 (8CPU, 8GB, 4 attached disks, nginx reverse proxy host, consul, nomad, traefik, mariadb, beast-of-arg jails)
 * minio2 (4CPU, 4GB, 4 attached disks)
 
 # Requirements

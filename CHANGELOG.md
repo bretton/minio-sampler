@@ -1,3 +1,11 @@
+0.7
+
+* Update README for number of cores and memory set for virtual machines
+* Update nginx.conf to do reverse proxy to different services (testing required)
+* Update vagrant port forwards
+
+---
+
 0.6
 
 * Cleanup networking for .2 and .3 IP addresses
