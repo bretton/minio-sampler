@@ -1,3 +1,9 @@
+0.5
+
+* Fix misnamed variable
+
+---
+
 0.4
 
 * vtnet1 is actually untrusted interface

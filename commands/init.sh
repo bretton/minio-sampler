@@ -1311,7 +1311,7 @@ cat >site.yml<<"EOF"
           -E NODENAME={{ beast_nodename }} \
           -E IP={{ beast_ip }} \
           -E CONSULSERVERS="{{ beast_join_consul }}" \
-          -E GOSSIPKEY="{{ honeyguide_gossip }}" \
+          -E GOSSIPKEY="{{ gossip_key }}" \
           -E GRAFANAUSER={{ beast_grafana_user }} \
           -E GRAFANAPASSWORD={{ beast_grafana_pass }} \
           -E SCRAPECONSUL="{{ beast_scrape_consul }}" \
