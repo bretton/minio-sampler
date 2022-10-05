@@ -220,16 +220,6 @@ function init_minio2_ssh() {
   vagrant ssh-config "$MINIO2" > "$SSHCONF_MINIO2"
 }
 
-# function init_minio3_ssh() {
-#   SSHCONF_MINIO3="_build/.ssh_conf.$MINIO3"
-#   vagrant ssh-config "$MINIO3" > "$SSHCONF_MINIO3"
-# }
-
-# function init_minio4_ssh() {
-#   SSHCONF_MINIO4="_build/.ssh_conf.$MINIO4"
-#   vagrant ssh-config "$MINIO4" > "$SSHCONF_MINIO4"
-# }
-
 function run_ssh_minio1 {
   if [ $DEBUG -eq 1 ]; then
     ssh -F "$SSHCONF_MINIO1" "$MINIO1" -- "$@" | tee -a "$LOGFILE"
@@ -248,20 +238,3 @@ function run_ssh_minio2 {
   fi
 }
 
-# function run_ssh_minio3 {
-#   if [ $DEBUG -eq 1 ]; then
-#     ssh -F "$SSHCONF_MINIO3" "$MINIO3" -- "$@" | tee -a "$LOGFILE"
-#     return "${PIPESTATUS[0]}"
-#   else
-#     ssh -F "$SSHCONF_MINIO3" "$MINIO3" -- "$@" >> "$LOGFILE"
-#   fi
-# }
-
-# function run_ssh_minio4 {
-#   if [ $DEBUG -eq 1 ]; then
-#     ssh -F "$SSHCONF_MINIO4" "$MINIO4" -- "$@" | tee -a "$LOGFILE"
-#     return "${PIPESTATUS[0]}"
-#   else
-#     ssh -F "$SSHCONF_MINIO4" "$MINIO4" -- "$@" >> "$LOGFILE"
-#   fi
-# }

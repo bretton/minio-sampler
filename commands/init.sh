@@ -937,7 +937,7 @@ cat >site.yml<<"EOF"
       content: |
         POT_ZFS_ROOT=zroot/srv/pot
         POT_FS_ROOT=/mnt/srv/pot
-        POT_EXTIF=vtnet1
+        POT_EXTIF=untrusted
 
   - name: Init pot and enable service
     become: yes
@@ -1156,7 +1156,7 @@ cat >site.yml<<"EOF"
         pot clone \
           -P {{ consul_pot_name }} \
           -p {{ consul_clone_name }} \
-          -N alias -i "vtnet1|{{ consul_ip }}" 
+          -N alias -i "untrusted|{{ consul_ip }}" 
         pot set-env -p {{ consul_clone_name }} \
           -E DATACENTER={{ datacenter_name }} \
           -E NODENAME={{ consul_nodename }} \
@@ -1194,7 +1194,7 @@ cat >site.yml<<"EOF"
       cmd: |
         pot clone -P {{ nomad_pot_name }} \
           -p {{ nomad_clone_name }} \
-          -N alias -i "vtnet1|{{ nomad_ip }}"
+          -N alias -i "untrusted|{{ nomad_ip }}"
         pot set-env -p {{ nomad_clone_name }} \
           -E NODENAME={{ nomad_nodename }} \
           -E DATACENTER={{ datacenter_name }} \
@@ -1233,7 +1233,7 @@ cat >site.yml<<"EOF"
       cmd: |
         pot clone -P {{ traefik_pot_name }} \
           -p {{ traefik_clone_name }} \
-          -N alias -i "vtnet1|{{ traefik_ip }}"
+          -N alias -i "untrusted|{{ traefik_ip }}"
         pot set-env -p {{ traefik_clone_name }} \
           -E NODENAME={{ traefik_nodename }} \
           -E DATACENTER={{ datacenter_name }} \
@@ -1264,7 +1264,7 @@ cat >site.yml<<"EOF"
       cmd: |
         pot clone -P {{ mariadb_pot_name }} \
           -p {{ mariadb_clone_name }} \
-          -N alias -i "vtnet1|{{ mariadb_ip }}"
+          -N alias -i "untrusted|{{ mariadb_ip }}"
         pot mount-in -p {{ mariadb_clone_name }} \
           -d {{ mariadb_mount_in }} \
           -m {{ mariadb_mount_dest }}
@@ -1302,7 +1302,7 @@ cat >site.yml<<"EOF"
       cmd: |
         pot clone -P {{ beast_pot_name }} \
           -p {{ beast_clone_name }} \
-          -N alias -i "vtnet1|{{ beast_ip }}"
+          -N alias -i "untrusted|{{ beast_ip }}"
         pot mount-in -p {{ beast_clone_name }} \
           -d {{ beast_mount_in }} \
           -m {{ beast_mount_dest }}
@@ -1526,15 +1526,15 @@ cat >site.yml<<"EOF"
         "enable_syslog": true,
         "leave_on_terminate": true,
         "start_join": [
-            "{{ consul_ip }}"
+          "{{ consul_ip }}"
         ],
         "telemetry": {
-            "prometheus_retention_time": "24h"
+          "prometheus_retention_time": "24h"
         },
         "service": {
-            "name": "node-exporter",
-            "tags": ["_app=host-server", "_service=node-exporter", "_hostname={{ minio2_hostname }}", "_datacenter={{ datacenter_name }}"],
-            "port": 9100
+          "name": "node-exporter",
+          "tags": ["_app=host-server", "_service=node-exporter", "_hostname={{ minio2_hostname }}", "_datacenter={{ datacenter_name }}"],
+          "port": 9100
         }
 
   - name: Set consul agent.json permissions
@@ -1611,10 +1611,10 @@ cat >site.yml<<"EOF"
           client_auto_join = true
         }
         telemetry {
-         publish_allocation_metrics = true
-         publish_node_metrics = true
-         prometheus_metrics = true
-         disable_hostname = true
+          publish_allocation_metrics = true
+          publish_node_metrics = true
+          prometheus_metrics = true
+          disable_hostname = true
         }
         enable_syslog=true
         log_level="DEBUG"
@@ -1800,7 +1800,6 @@ cat >site.yml<<"EOF"
         service syslog-ng enable
         sysrc syslog_ng_flags="-R /tmp/syslog-ng.persist" 
         service syslog-ng restart
-
 EOF
 
 step "Create Vagrantfile"
@@ -1819,7 +1818,7 @@ Vagrant.configure("2") do |config|
     node.ssh.connect_timeout = 60
     node.ssh.keep_alive = true
     node.vm.provider "virtualbox" do |vb|
-      vb.memory = "4096"
+      vb.memory = "8192"
       vb.cpus = "8"
       vb.customize ["modifyvm", :id, "--ioapic", "on"]
       vb.customize ["modifyvm", :id, "--vrde", "off"]

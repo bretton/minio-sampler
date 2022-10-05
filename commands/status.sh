@@ -56,10 +56,6 @@ git --version >/dev/null
 vagrant --version >/dev/null
 vboxheadless --version >/dev/null
 
-# step "Make sure vagrant plugins are installed"
-# (vagrant plugin list | grep "vagrant-disksize" >/dev/null)\
-#   || VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 vagrant plugin install vagrant-disksize
-
 step "Show vagrant status"
 echo "
 ===> Vagrant status <==="

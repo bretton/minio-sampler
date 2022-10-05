@@ -1,3 +1,10 @@
+0.4
+
+* vtnet1 is actually untrusted interface
+* formatting and indentation fixes
+
+---
+
 0.3
 
 * Fix paths for consul configuration
