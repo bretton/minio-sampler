@@ -1922,18 +1922,12 @@ Vagrant.configure("2") do |config|
       vb.customize ["setextradata", :id,
         "VBoxInternal/Devices/ahci/0/LUN#[0]/Config/IgnoreFlush", "0"]
       vb.default_nic_type = "virtio"
-    node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1",
-      host: 10122, id: "minio1-ssh"
-    node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1",
-      host: 10901, id: "minio1-minio"
-    node.vm.network :forwarded_port, guest: 3000, host_ip: "${NETWORK}.1",
-      host: 10903, id: "minio1-grafana"
-    node.vm.network :forwarded_port, guest: 9090, host_ip: "${NETWORK}.1",
-      host: 10904, id: "minio1-prometheus"
-    node.vm.network :forwarded_port, guest: 9093, host_ip: "${NETWORK}.1",
-      host: 10905, id: "minio1-alertmanager"
-    node.vm.network :forwarded_port, guest: 29000, host_ip: "${NETWORK}.1",
-      host: 10906, id: "minio1-nextcloud"
+    node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1", host: 10122, id: "minio1-ssh"
+    node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1", host: 10901, id: "minio1-minio"
+    node.vm.network :forwarded_port, guest: 3000, host_ip: "${NETWORK}.1", host: 10903, id: "minio1-grafana"
+    node.vm.network :forwarded_port, guest: 9090, host_ip: "${NETWORK}.1", host: 10904, id: "minio1-prometheus"
+    node.vm.network :forwarded_port, guest: 9093, host_ip: "${NETWORK}.1", host: 10905, id: "minio1-alertmanager"
+    node.vm.network :forwarded_port, guest: 29000, host_ip: "${NETWORK}.1", host: 10906, id: "minio1-nextcloud"
     end
     node.vm.network :private_network, ip: "${NETWORK}.2", auto_config: false
     node.vm.network :public_network, ip: "${ACCESSIP}", auto_config: false
@@ -1994,10 +1988,8 @@ Vagrant.configure("2") do |config|
       vb.customize ["setextradata", :id,
         "VBoxInternal/Devices/ahci/0/LUN#[0]/Config/IgnoreFlush", "0"]
       vb.default_nic_type = "virtio"
-    node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1",
-      host: 10222, id: "minio2-ssh"
-    node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1",
-      host: 10902, id: "minio2-minio"
+    node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1", host: 10222, id: "minio2-ssh"
+    node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1", host: 10902, id: "minio2-minio"
     end
     node.vm.network :private_network, ip: "${NETWORK}.3", auto_config: false
     node.vm.provision "shell", run: "always", inline: <<-SHELL
