@@ -1,3 +1,9 @@
+0.8
+
+* Increment added port forward by one to not clash with minio2
+
+---
+
 0.7
 
 * Update README for number of cores and memory set for virtual machines

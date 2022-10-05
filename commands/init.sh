@@ -775,7 +775,7 @@ cat >site.yml<<"EOF"
               chunked_transfer_encoding off;
               proxy_buffering off;
               proxy_ssl_verify off;
-              proxy_pass http://{{ minio_nat_gateway }}:10902;
+              proxy_pass http://{{ minio_nat_gateway }}:10903;
             }
           }
           server {
@@ -795,7 +795,7 @@ cat >site.yml<<"EOF"
               chunked_transfer_encoding off;
               proxy_buffering off;
               proxy_ssl_verify off;
-              proxy_pass http://{{ minio_nat_gateway }}:10903;
+              proxy_pass http://{{ minio_nat_gateway }}:10904;
             }
           }
           server {
@@ -815,7 +815,7 @@ cat >site.yml<<"EOF"
               chunked_transfer_encoding off;
               proxy_buffering off;
               proxy_ssl_verify off;
-              proxy_pass http://{{ minio_nat_gateway }}:10904;
+              proxy_pass http://{{ minio_nat_gateway }}:10905;
             }
           }
           server {
@@ -837,7 +837,7 @@ cat >site.yml<<"EOF"
               chunked_transfer_encoding off;
               proxy_buffering off;
               proxy_ssl_verify off;
-              proxy_pass https://{{ minio_nat_gateway }}:10905;
+              proxy_pass https://{{ minio_nat_gateway }}:10906;
             }
           }
         }
@@ -1927,13 +1927,13 @@ Vagrant.configure("2") do |config|
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1",
       host: 10901, id: "minio1-minio"
     node.vm.network :forwarded_port, guest: 3000, host_ip: "${NETWORK}.1",
-      host: 10902, id: "minio1-grafana"
+      host: 10903, id: "minio1-grafana"
     node.vm.network :forwarded_port, guest: 9090, host_ip: "${NETWORK}.1",
-      host: 10903, id: "minio1-prometheus"
+      host: 10904, id: "minio1-prometheus"
     node.vm.network :forwarded_port, guest: 9093, host_ip: "${NETWORK}.1",
-      host: 10904, id: "minio1-alertmanager"
+      host: 10905, id: "minio1-alertmanager"
     node.vm.network :forwarded_port, guest: 29000, host_ip: "${NETWORK}.1",
-      host: 10905, id: "minio1-nextcloud"
+      host: 10906, id: "minio1-nextcloud"
     end
     node.vm.network :private_network, ip: "${NETWORK}.2", auto_config: false
     node.vm.network :public_network, ip: "${ACCESSIP}", auto_config: false
