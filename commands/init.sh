@@ -1845,14 +1845,14 @@ Vagrant.configure("2") do |config|
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1",
       host: 10901, id: "minio1-minio"
     end
-    node.vm.network :private_network, ip: "${NETWORK}.10", auto_config: false
+    node.vm.network :private_network, ip: "${NETWORK}.2", auto_config: false
     node.vm.network :public_network, ip: "${ACCESSIP}", auto_config: false
     node.vm.provision "shell", run: "always", inline: <<-SHELL
       sysrc ipv6_network_interfaces="none"
       sysrc ifconfig_vtnet1_name="untrusted"
       sysrc defaultrouter="${GATEWAY}"
       sysrc gateway_enable="YES"
-      sysrc ifconfig_vtnet1="inet ${NETWORK}.10 netmask 255.255.255.0"
+      sysrc ifconfig_vtnet1="inet ${NETWORK}.2 netmask 255.255.255.0"
       sysrc ifconfig_vtnet2="inet ${ACCESSIP} netmask 255.255.255.0"
       sysctl -w net.inet.tcp.msl=3000
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
@@ -1909,13 +1909,13 @@ Vagrant.configure("2") do |config|
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1",
       host: 10902, id: "minio2-minio"
     end
-    node.vm.network :private_network, ip: "${NETWORK}.20", auto_config: false
+    node.vm.network :private_network, ip: "${NETWORK}.3", auto_config: false
     node.vm.provision "shell", run: "always", inline: <<-SHELL
       sysrc ipv6_network_interfaces="none"
       sysrc ifconfig_vtnet1_name="untrusted"
       sysrc defaultrouter="${GATEWAY}"
       sysrc gateway_enable="YES"
-      sysrc ifconfig_vtnet1="inet ${NETWORK}.20 netmask 255.255.255.0"
+      sysrc ifconfig_vtnet1="inet ${NETWORK}.3 netmask 255.255.255.0"
       sysctl -w net.inet.tcp.msl=3000
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
       echo 'interface "vtnet1" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf

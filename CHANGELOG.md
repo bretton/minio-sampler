@@ -1,3 +1,9 @@
+0.6
+
+* Cleanup networking for .2 and .3 IP addresses
+
+---
+
 0.5
 
 * Fix misnamed variable
