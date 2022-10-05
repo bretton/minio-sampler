@@ -1,3 +1,9 @@
+0.10
+
+* Add missing port forwards, update nginx config
+
+---
+
 0.9
 
 * Update README

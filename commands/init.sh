@@ -819,6 +819,66 @@ cat >site.yml<<"EOF"
             }
           }
           server {
+            listen 4646;
+            server_name {{ minio1_hostname }};
+            ignore_invalid_headers off;
+            client_max_body_size 0;
+            proxy_buffering off;
+            location / {
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+              proxy_set_header Host $http_host;
+              proxy_connect_timeout 300;
+              proxy_http_version 1.1;
+              proxy_set_header Connection "";
+              chunked_transfer_encoding off;
+              proxy_buffering off;
+              proxy_ssl_verify off;
+              proxy_pass http://{{ minio_nat_gateway }}:10907;
+            }
+          }
+          server {
+            listen 8500;
+            server_name {{ minio1_hostname }};
+            ignore_invalid_headers off;
+            client_max_body_size 0;
+            proxy_buffering off;
+            location / {
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+              proxy_set_header Host $http_host;
+              proxy_connect_timeout 300;
+              proxy_http_version 1.1;
+              proxy_set_header Connection "";
+              chunked_transfer_encoding off;
+              proxy_buffering off;
+              proxy_ssl_verify off;
+              proxy_pass http://{{ minio_nat_gateway }}:10908;
+            }
+          }
+          server {
+            listen 9002;
+            server_name {{ minio1_hostname }};
+            ignore_invalid_headers off;
+            client_max_body_size 0;
+            proxy_buffering off;
+            location / {
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+              proxy_set_header Host $http_host;
+              proxy_connect_timeout 300;
+              proxy_http_version 1.1;
+              proxy_set_header Connection "";
+              chunked_transfer_encoding off;
+              proxy_buffering off;
+              proxy_ssl_verify off;
+              proxy_pass http://{{ minio_nat_gateway }}:10909;
+            }
+          }
+          server {
             listen 443 ssl;
             ssl_certificate {{ local_openssl_dir }}/{{ local_openssl_nginx_cert }};
             ssl_certificate_key {{ local_openssl_dir }}/{{ local_openssl_private_key }};
@@ -1928,6 +1988,9 @@ Vagrant.configure("2") do |config|
     node.vm.network :forwarded_port, guest: 9090, host_ip: "${NETWORK}.1", host: 10904, id: "minio1-prometheus"
     node.vm.network :forwarded_port, guest: 9093, host_ip: "${NETWORK}.1", host: 10905, id: "minio1-alertmanager"
     node.vm.network :forwarded_port, guest: 29000, host_ip: "${NETWORK}.1", host: 10906, id: "minio1-nextcloud"
+    node.vm.network :forwarded_port, guest: 4646, host_ip: "${NETWORK}.1", host: 10907, id: "minio1-nomad"
+    node.vm.network :forwarded_port, guest: 8500, host_ip: "${NETWORK}.1", host: 10908, id: "minio1-consul"
+    node.vm.network :forwarded_port, guest: 9002, host_ip: "${NETWORK}.1", host: 10909, id: "minio1-traefik"
     end
     node.vm.network :private_network, ip: "${NETWORK}.2", auto_config: false
     node.vm.network :public_network, ip: "${ACCESSIP}", auto_config: false
