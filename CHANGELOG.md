@@ -1,3 +1,10 @@
+0.11
+
+* Add more nginx workers
+* Fix jail IP address subnet typo
+
+---
+
 0.10
 
 * Add missing port forwards, update nginx config

@@ -189,7 +189,7 @@ cat >site.yml<<"EOF"
       consul_pot_name: consul-amd64-13_1_2_0_21
       consul_clone_name: consul-clone
       consul_url: https://potluck.honeyguide.net/consul
-      consul_ip: 10.100.0.10
+      consul_ip: 10.100.1.10
       consul_nodename: consul
       consul_bootstrap: 1
       consul_peers: ""
@@ -197,7 +197,7 @@ cat >site.yml<<"EOF"
       nomad_version: 2.0.16
       nomad_pot_name: nomad-server-amd64-13_1_2_0_16
       nomad_clone_name: nomad-server-clone
-      nomad_ip: 10.100.0.11
+      nomad_ip: 10.100.1.11
       nomad_nodename: nomad
       nomad_url: https://potluck.honeyguide.net/nomad-server
       nomad_bootstrap: 1
@@ -207,7 +207,7 @@ cat >site.yml<<"EOF"
       traefik_pot_name: traefik-consul-amd64-13_1_1_3_1
       traefik_clone_name: traefik-consul-clone
       traefik_url: https://potluck.honeyguide.net/traefik-consul
-      traefik_ip: 10.100.0.12
+      traefik_ip: 10.100.1.12
       traefik_mount_in: /mnt/data/jaildata/traefik
       traefik_nodename: traefikconsul
       beast_base: beast-of-argh-amd64-13_1
@@ -216,17 +216,17 @@ cat >site.yml<<"EOF"
       beast_nodename: beast
       beast_url: https://potluck.honeyguide.net/beast-of-argh/
       beast_clone_name: beast-clone
-      beast_ip: 10.100.0.99
+      beast_ip: 10.100.1.99
       beast_mount_in: /mnt/data/jaildata/beast
       beast_mount_dest: /mnt
-      beast_join_consul: "10.100.0.10"
+      beast_join_consul: "10.100.1.10"
       beast_grafana_user: admin
       beast_grafana_pass: sampler
-      beast_scrape_consul: "10.100.0.10:8500"
-      beast_scrape_nomad: "10.100.0.11:4646"
-      beast_scrape_db: "10.100.0.15"
-      beast_scrape_traefik: "10.100.0.12:8082"
-      beast_influxsource: "10.100.0.80"
+      beast_scrape_consul: "10.100.1.10:8500"
+      beast_scrape_nomad: "10.100.1.11:4646"
+      beast_scrape_db: "10.100.1.15"
+      beast_scrape_traefik: "10.100.1.12:8082"
+      beast_influxsource: "10.100.1.80"
       beast_influxname: database
       beast_smtphostport: "localhost:25"
       beast_smtp_user: "your@exmaple.com"
@@ -241,7 +241,7 @@ cat >site.yml<<"EOF"
       mariadb_url: https://potluck.honeyguide.net/mariadb
       mariadb_nodename: mariadb
       mariadb_clone_name: mariadb-clone
-      mariadb_ip: 10.100.0.15
+      mariadb_ip: 10.100.1.15
       mariadb_mount_in: /mnt/data/jaildata/mariadb/var_db_mysql
       mariadb_mount_dest: /var/db/mysql
       mariadb_dumpuser: root
@@ -724,7 +724,7 @@ cat >site.yml<<"EOF"
         worker_processes  1;
         error_log /var/log/nginx/error.log;
         events {
-          worker_connections 1024;
+          worker_connections 4096;
         }
         http {
           include mime.types;
