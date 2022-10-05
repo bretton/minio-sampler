@@ -1,3 +1,12 @@
+0.3
+
+* Fix paths for consul configuration
+* Adjust ERRATA file for /etc/vbox warning
+* Adjust ansible for "scp_if_ssh = True"
+* vtnet1 not vtnet0 for host interface pot jails associate with
+
+---
+
 0.2
 
 * Trim to 2 hosts

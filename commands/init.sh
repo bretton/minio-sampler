@@ -937,7 +937,7 @@ cat >site.yml<<"EOF"
       content: |
         POT_ZFS_ROOT=zroot/srv/pot
         POT_FS_ROOT=/mnt/srv/pot
-        POT_EXTIF=vtnet0
+        POT_EXTIF=vtnet1
 
   - name: Init pot and enable service
     become: yes
@@ -1156,7 +1156,7 @@ cat >site.yml<<"EOF"
         pot clone \
           -P {{ consul_pot_name }} \
           -p {{ consul_clone_name }} \
-          -N alias -i "vtnet0|{{ consul_ip }}" 
+          -N alias -i "vtnet1|{{ consul_ip }}" 
         pot set-env -p {{ consul_clone_name }} \
           -E DATACENTER={{ datacenter_name }} \
           -E NODENAME={{ consul_nodename }} \
@@ -1194,7 +1194,7 @@ cat >site.yml<<"EOF"
       cmd: |
         pot clone -P {{ nomad_pot_name }} \
           -p {{ nomad_clone_name }} \
-          -N alias -i "vtnet0|{{ nomad_ip }}"
+          -N alias -i "vtnet1|{{ nomad_ip }}"
         pot set-env -p {{ nomad_clone_name }} \
           -E NODENAME={{ nomad_nodename }} \
           -E DATACENTER={{ datacenter_name }} \
@@ -1233,7 +1233,7 @@ cat >site.yml<<"EOF"
       cmd: |
         pot clone -P {{ traefik_pot_name }} \
           -p {{ traefik_clone_name }} \
-          -N alias -i "vtnet0|{{ traefik_ip }}"
+          -N alias -i "vtnet1|{{ traefik_ip }}"
         pot set-env -p {{ traefik_clone_name }} \
           -E NODENAME={{ traefik_nodename }} \
           -E DATACENTER={{ datacenter_name }} \
@@ -1264,7 +1264,7 @@ cat >site.yml<<"EOF"
       cmd: |
         pot clone -P {{ mariadb_pot_name }} \
           -p {{ mariadb_clone_name }} \
-          -N alias -i "vtnet0|{{ mariadb_ip }}"
+          -N alias -i "vtnet1|{{ mariadb_ip }}"
         pot mount-in -p {{ mariadb_clone_name }} \
           -d {{ mariadb_mount_in }} \
           -m {{ mariadb_mount_dest }}
@@ -1302,7 +1302,7 @@ cat >site.yml<<"EOF"
       cmd: |
         pot clone -P {{ beast_pot_name }} \
           -p {{ beast_clone_name }} \
-          -N alias -i "vtnet0|{{ beast_ip }}"
+          -N alias -i "vtnet1|{{ beast_ip }}"
         pot mount-in -p {{ beast_clone_name }} \
           -d {{ beast_mount_in }} \
           -m {{ beast_mount_dest }}
@@ -1850,14 +1850,14 @@ Vagrant.configure("2") do |config|
     node.vm.network :public_network, ip: "${ACCESSIP}", auto_config: false
     node.vm.provision "shell", run: "always", inline: <<-SHELL
       sysrc ipv6_network_interfaces="none"
-      sysrc ifconfig_vtnet0_name="untrusted"
+      sysrc ifconfig_vtnet1_name="untrusted"
       sysrc defaultrouter="${GATEWAY}"
       sysrc gateway_enable="YES"
       sysrc ifconfig_vtnet1="inet ${NETWORK}.10 netmask 255.255.255.0"
       sysrc ifconfig_vtnet2="inet ${ACCESSIP} netmask 255.255.255.0"
       sysctl -w net.inet.tcp.msl=3000
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
-      echo 'interface "vtnet0" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
+      echo 'interface "vtnet1" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
       service netif restart && service routing restart
       ping -c 1 google.com
       mkdir -p /mnt/minio
@@ -1913,13 +1913,13 @@ Vagrant.configure("2") do |config|
     node.vm.network :private_network, ip: "${NETWORK}.20", auto_config: false
     node.vm.provision "shell", run: "always", inline: <<-SHELL
       sysrc ipv6_network_interfaces="none"
-      sysrc ifconfig_vtnet0_name="untrusted"
+      sysrc ifconfig_vtnet1_name="untrusted"
       sysrc defaultrouter="${GATEWAY}"
       sysrc gateway_enable="YES"
       sysrc ifconfig_vtnet1="inet ${NETWORK}.20 netmask 255.255.255.0"
       sysctl -w net.inet.tcp.msl=3000
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
-      echo 'interface "vtnet0" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
+      echo 'interface "vtnet1" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
       service netif restart && service routing restart
       ping -c 1 google.com
       mkdir -p /mnt/minio
@@ -1974,6 +1974,7 @@ timeout = 30
 log_path = ansible.log
 [ssh_connection]
 retries=10
+scp_if_ssh = True
 EOCFG
 
 
