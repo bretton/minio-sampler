@@ -1,3 +1,10 @@
+0.13
+
+* Updating README
+* Changing IP addresses, leaving vtnet1 unnamed, removing untrusted name, bugfixing IP issues
+
+---
+
 0.12
 
 * Adjust IP addresses for testing purposes

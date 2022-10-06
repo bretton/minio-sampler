@@ -7,7 +7,7 @@ This is a testing environment to show `minio` running on FreeBSD, with `consul`,
 
 # Outline
 This will bring up 2 minio servers:
-* minio1 (8CPU, 8GB, 4 attached disks, nginx reverse proxy host, consul, nomad, traefik, mariadb, beast-of-arg jails)
+* minio1 (8CPU, 8GB, 4 attached disks)
 * minio2 (4CPU, 4GB, 4 attached disks)
 
 # Requirements
