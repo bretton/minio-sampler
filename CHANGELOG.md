@@ -1,3 +1,9 @@
+0.16
+
+* Trying different setup with minio commands for insecure flag
+
+---
+
 0.15
 
 * Minio alias set, bucket creation, remove config host add
