@@ -148,6 +148,8 @@ cat >site.yml<<"EOF"
       minio_access_ip: "{{ lookup('file', 'access.ip') }}"
       minio1_hostname: minio1
       minio2_hostname: minio2
+      minio_resource: sampler
+      minio_dataset: mydata
       minio_nat_gateway: 10.100.1.1
       minio1_ip_address: 10.100.1.3
       minio2_ip_address: 10.100.1.4
@@ -1074,13 +1076,13 @@ cat >site.yml<<"EOF"
       port: 22
       delay: 2
 
-  - name: setup minio1 alias
+  - name: setup minio aliases and initial bucket
     become: yes
     become_user: root
     shell:
       cmd: |
-        minio-client config host add --config-dir /.minio-client --insecure {{ minio1_hostname }} https://{{ minio1_ip_address }}:9000 {{  minio_access_key }} {{ minio_access_password }}
-        minio-client config host add --config-dir /.minio-client --insecure {{ minio2_hostname }} https://{{ minio2_ip_address }}:9000 {{  minio_access_key }} {{ minio_access_password }}
+        minio-client alias set --insecure {{ minio_resource }} https://{{ minio1_ip_address }} {{  minio_access_key }} {{ minio_access_password }}
+        minio-client mb --insecure --with-locks {{ minio_resource }}/{{ minio_dataset }}
 
   - name: Setup ZFS datasets
     become: yes

@@ -1,3 +1,9 @@
+0.15
+
+* Minio alias set, bucket creation, remove config host add
+
+---
+
 0.14
 
 * Fixing minio for cli config
