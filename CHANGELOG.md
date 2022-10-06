@@ -1,3 +1,10 @@
+0.12
+
+* Adjust IP addresses for testing purposes
+* Update ports, update README
+
+---
+
 0.11
 
 * Add more nginx workers

@@ -171,7 +171,7 @@ minsampler startvms
 
 ## Minio Dashboard
 
-The Minio web interface is available via nginx reverse proxy at https://ACCESSIP:9000 for the IP address set in ACCESSIP variable of `config.ini`.
+The Minio web interface is available via nginx reverse proxy at https://ACCESSIP:19000 for the IP address set in ACCESSIP variable of `config.ini`.
 
 Accept the self-signed certificate TWICE. First is for nginx, second minio. Remember, this is not a production-ready environment. 
 

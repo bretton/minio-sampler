@@ -149,16 +149,16 @@ cat >site.yml<<"EOF"
       minio1_hostname: minio1
       minio2_hostname: minio2
       minio_nat_gateway: 10.100.1.1
-      minio1_ip_address: 10.100.1.2
-      minio2_ip_address: 10.100.1.3
-      minio1_disk1: https://10.100.1.2:9000/mnt/minio/disk1
-      minio1_disk2: https://10.100.1.2:9000/mnt/minio/disk2
-      minio1_disk3: https://10.100.1.2:9000/mnt/minio/disk3
-      minio1_disk4: https://10.100.1.2:9000/mnt/minio/disk4
-      minio2_disk1: https://10.100.1.3:9000/mnt/minio/disk1
-      minio2_disk2: https://10.100.1.3:9000/mnt/minio/disk2
-      minio2_disk3: https://10.100.1.3:9000/mnt/minio/disk3
-      minio2_disk4: https://10.100.1.3:9000/mnt/minio/disk4
+      minio1_ip_address: 10.100.1.3
+      minio2_ip_address: 10.100.1.4
+      minio1_disk1: https://10.100.1.3:9000/mnt/minio/disk1
+      minio1_disk2: https://10.100.1.3:9000/mnt/minio/disk2
+      minio1_disk3: https://10.100.1.3:9000/mnt/minio/disk3
+      minio1_disk4: https://10.100.1.3:9000/mnt/minio/disk4
+      minio2_disk1: https://10.100.1.4:9000/mnt/minio/disk1
+      minio2_disk2: https://10.100.1.4:9000/mnt/minio/disk2
+      minio2_disk3: https://10.100.1.4:9000/mnt/minio/disk3
+      minio2_disk4: https://10.100.1.4:9000/mnt/minio/disk4
       minio_erasure_coding_collection: https://minio{1...2}:9000/mnt/minio/disk{1...4}
       minio_nameserver: 8.8.8.8
       minio_ssh_key: "~/.ssh/miniokey"
@@ -229,7 +229,7 @@ cat >site.yml<<"EOF"
       beast_influxsource: "10.100.1.80"
       beast_influxname: database
       beast_smtphostport: "localhost:25"
-      beast_smtp_user: "your@exmaple.com"
+      beast_smtp_user: "your@example.com"
       beast_smtp_pass: "examplepass"
       beast_smtp_from: "sampler@minio-sampler.com"
       beast_alertaddress: "your@example.com"
@@ -248,7 +248,7 @@ cat >site.yml<<"EOF"
       mariadb_rootpass: sampler
       mariadb_scrapepass: sampler
       mariadb_dumpfile: /var/db/mysql/full_mariadb_backup.sql
-      mariadb_dumpschedule: 5 21 * * *
+      mariadb_dumpschedule: "5 21 * * *"
 
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:
@@ -335,7 +335,6 @@ cat >site.yml<<"EOF"
         - rsync
         - tmux
         - jq
-        - ripgrep
         - dmidecode
         - openntpd
         - pftop
@@ -734,10 +733,18 @@ cat >site.yml<<"EOF"
           gzip off;
           server {                              
             listen 80;
-            return 301 https://$host$request_uri;
+            server_name {{ minio1_hostname }};
+            ignore_invalid_headers off;
+            client_max_body_size 0;
+            proxy_buffering off;
+            root /usr/local/www/sampler;
+            index index.html;
+            location / {
+               try_files $uri $uri/ /index.html;
+            }
           } 
           server {
-            listen 9000 ssl;
+            listen 19000 ssl;
             ssl_certificate {{ local_openssl_dir }}/{{ local_openssl_nginx_cert }};
             ssl_certificate_key {{ local_openssl_dir }}/{{ local_openssl_private_key }};
             server_name {{ minio1_hostname }};
@@ -767,14 +774,12 @@ cat >site.yml<<"EOF"
             location / {
               proxy_set_header X-Real-IP $remote_addr;
               proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-              proxy_set_header X-Forwarded-Proto $scheme;
               proxy_set_header Host $http_host;
               proxy_connect_timeout 300;
               proxy_http_version 1.1;
               proxy_set_header Connection "";
               chunked_transfer_encoding off;
               proxy_buffering off;
-              proxy_ssl_verify off;
               proxy_pass http://{{ minio_nat_gateway }}:10903;
             }
           }
@@ -787,14 +792,12 @@ cat >site.yml<<"EOF"
             location / {
               proxy_set_header X-Real-IP $remote_addr;
               proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-              proxy_set_header X-Forwarded-Proto $scheme;
               proxy_set_header Host $http_host;
               proxy_connect_timeout 300;
               proxy_http_version 1.1;
               proxy_set_header Connection "";
               chunked_transfer_encoding off;
               proxy_buffering off;
-              proxy_ssl_verify off;
               proxy_pass http://{{ minio_nat_gateway }}:10904;
             }
           }
@@ -807,14 +810,12 @@ cat >site.yml<<"EOF"
             location / {
               proxy_set_header X-Real-IP $remote_addr;
               proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-              proxy_set_header X-Forwarded-Proto $scheme;
               proxy_set_header Host $http_host;
               proxy_connect_timeout 300;
               proxy_http_version 1.1;
               proxy_set_header Connection "";
               chunked_transfer_encoding off;
               proxy_buffering off;
-              proxy_ssl_verify off;
               proxy_pass http://{{ minio_nat_gateway }}:10905;
             }
           }
@@ -827,14 +828,12 @@ cat >site.yml<<"EOF"
             location / {
               proxy_set_header X-Real-IP $remote_addr;
               proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-              proxy_set_header X-Forwarded-Proto $scheme;
               proxy_set_header Host $http_host;
               proxy_connect_timeout 300;
               proxy_http_version 1.1;
               proxy_set_header Connection "";
               chunked_transfer_encoding off;
               proxy_buffering off;
-              proxy_ssl_verify off;
               proxy_pass http://{{ minio_nat_gateway }}:10907;
             }
           }
@@ -847,14 +846,12 @@ cat >site.yml<<"EOF"
             location / {
               proxy_set_header X-Real-IP $remote_addr;
               proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-              proxy_set_header X-Forwarded-Proto $scheme;
               proxy_set_header Host $http_host;
               proxy_connect_timeout 300;
               proxy_http_version 1.1;
               proxy_set_header Connection "";
               chunked_transfer_encoding off;
               proxy_buffering off;
-              proxy_ssl_verify off;
               proxy_pass http://{{ minio_nat_gateway }}:10908;
             }
           }
@@ -867,14 +864,12 @@ cat >site.yml<<"EOF"
             location / {
               proxy_set_header X-Real-IP $remote_addr;
               proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-              proxy_set_header X-Forwarded-Proto $scheme;
               proxy_set_header Host $http_host;
               proxy_connect_timeout 300;
               proxy_http_version 1.1;
               proxy_set_header Connection "";
               chunked_transfer_encoding off;
               proxy_buffering off;
-              proxy_ssl_verify off;
               proxy_pass http://{{ minio_nat_gateway }}:10909;
             }
           }
@@ -901,6 +896,46 @@ cat >site.yml<<"EOF"
             }
           }
         }
+  
+  - name: Create directory /usr/local/www/sampler
+    ansible.builtin.file:
+      path: /usr/local/www/sampler
+      state: directory
+      mode: '0755'
+      owner: root
+      group: wheel
+
+  - name: Create default sampler index.html
+    become: yes
+    become_user: root
+    copy:
+      dest: /usr/local/www/sampler/index.html
+      content: |
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <title>Welcome to minio-sampler!</title>
+        <style>
+        html { color-scheme: light dark; }
+        body { width: 35em; margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif; }
+        </style>
+        </head>
+        <body>
+        <h1>Welcome to minio-sampler!</h1>
+        <p>Please choose from the following:</p>
+        <ul>
+          <li><a href="https://{{ minio_nat_gateway }}:19000">Minio dashboard</a></li>
+          <li><a href="http://{{ minio_nat_gateway }}:3000">Grafana</a></li>
+          <li><a href="http://{{ minio_nat_gateway }}:9090">Prometheus</a></li>
+          <li><a href="http://{{ minio_nat_gateway }}:9093">Alertmanager</a></li>
+          <li><a href="http://{{ minio_nat_gateway }}:4646">Nomad</a></li>
+          <li><a href="http://{{ minio_nat_gateway }}:8500">Consul</a></li>
+          <li><a href="http://{{ minio_nat_gateway }}:9002">Traefik</a></li>
+          <li><a href="http://{{ minio_nat_gateway }}:29000">Nextcloud</a></li>
+        </ul>
+        </body>
+        </html>
 
   - name: Enable nginx
     become: yes
@@ -1038,6 +1073,13 @@ cat >site.yml<<"EOF"
     wait_for:
       port: 22
       delay: 2
+
+  - name: setup minio1 alias
+    become: yes
+    become_user: root
+    shell:
+      cmd: |
+        minio-client alias set {{ minio1_hostname }} https://{{ minio1_ip_address }}:9000 {{  minio_access_key }} {{ minio_access_password }}
 
   - name: Setup ZFS datasets
     become: yes
@@ -1992,14 +2034,14 @@ Vagrant.configure("2") do |config|
     node.vm.network :forwarded_port, guest: 8500, host_ip: "${NETWORK}.1", host: 10908, id: "minio1-consul"
     node.vm.network :forwarded_port, guest: 9002, host_ip: "${NETWORK}.1", host: 10909, id: "minio1-traefik"
     end
-    node.vm.network :private_network, ip: "${NETWORK}.2", auto_config: false
+    node.vm.network :private_network, ip: "${NETWORK}.3", auto_config: false
     node.vm.network :public_network, ip: "${ACCESSIP}", auto_config: false
     node.vm.provision "shell", run: "always", inline: <<-SHELL
       sysrc ipv6_network_interfaces="none"
-      sysrc ifconfig_vtnet1_name="untrusted"
       sysrc defaultrouter="${GATEWAY}"
       sysrc gateway_enable="YES"
-      sysrc ifconfig_vtnet1="inet ${NETWORK}.2 netmask 255.255.255.0"
+      sysrc ifconfig_vtnet1="inet ${NETWORK}.3 netmask 255.255.255.0"
+      sysrc ifconfig_vtnet1_name="untrusted"
       sysrc ifconfig_vtnet2="inet ${ACCESSIP} netmask 255.255.255.0"
       sysctl -w net.inet.tcp.msl=3000
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
@@ -2054,13 +2096,13 @@ Vagrant.configure("2") do |config|
     node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1", host: 10222, id: "minio2-ssh"
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1", host: 10902, id: "minio2-minio"
     end
-    node.vm.network :private_network, ip: "${NETWORK}.3", auto_config: false
+    node.vm.network :private_network, ip: "${NETWORK}.4", auto_config: false
     node.vm.provision "shell", run: "always", inline: <<-SHELL
       sysrc ipv6_network_interfaces="none"
-      sysrc ifconfig_vtnet1_name="untrusted"
       sysrc defaultrouter="${GATEWAY}"
       sysrc gateway_enable="YES"
-      sysrc ifconfig_vtnet1="inet ${NETWORK}.3 netmask 255.255.255.0"
+      sysrc ifconfig_vtnet1="inet ${NETWORK}.4 netmask 255.255.255.0"
+      sysrc ifconfig_vtnet1_name="untrusted"
       sysctl -w net.inet.tcp.msl=3000
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
       echo 'interface "vtnet1" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
