@@ -1081,8 +1081,8 @@ cat >site.yml<<"EOF"
     become_user: root
     shell:
       cmd: |
-        env MINIO_ACCESS_KEY={{ minio_access_key }}
-        env MINIO_SECRET_KEY={{ minio_access_password }}"
+        env MINIO_ACCESS_KEY="{{ minio_access_key }}"
+        env MINIO_SECRET_KEY="{{ minio_access_password }}"
         minio-client --insecure alias set {{ minio_resource }} https://{{ minio1_ip_address }} {{  minio_access_key }} {{ minio_access_password }} --api S3v4
         minio-client --insecure mb --with-lock {{ minio_resource }}/{{ minio_dataset }}
 
