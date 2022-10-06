@@ -1,3 +1,9 @@
+0.14
+
+* Fixing minio for cli config
+
+---
+
 0.13
 
 * Updating README

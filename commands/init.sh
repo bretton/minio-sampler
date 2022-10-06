@@ -1079,7 +1079,8 @@ cat >site.yml<<"EOF"
     become_user: root
     shell:
       cmd: |
-        minio-client alias set {{ minio1_hostname }} https://{{ minio1_ip_address }}:9000 {{  minio_access_key }} {{ minio_access_password }}
+        minio-client config host add --config-dir /.minio-client --insecure {{ minio1_hostname }} https://{{ minio1_ip_address }}:9000 {{  minio_access_key }} {{ minio_access_password }}
+        minio-client config host add --config-dir /.minio-client --insecure {{ minio2_hostname }} https://{{ minio2_ip_address }}:9000 {{  minio_access_key }} {{ minio_access_password }}
 
   - name: Setup ZFS datasets
     become: yes
