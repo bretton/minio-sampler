@@ -1083,8 +1083,8 @@ cat >site.yml<<"EOF"
       cmd: |
         env MINIO_ACCESS_KEY="{{ minio_access_key }}"
         env MINIO_SECRET_KEY="{{ minio_access_password }}"
-        minio-client --insecure alias set {{ minio_resource }} https://{{ minio1_ip_address }} {{  minio_access_key }} {{ minio_access_password }} --api S3v4
-        minio-client --insecure mb --with-lock {{ minio_resource }}/{{ minio_dataset }}
+        minio-client alias set {{ minio_resource }} https://{{ minio_nat_gateway }}:10901 {{  minio_access_key }} {{ minio_access_password }} --api S3v4  --insecure --config-dir /root/.minio-client/
+        minio-client mb --insecure  --config-dir /root/.minio-client/ --with-lock {{ minio_resource }}/{{ minio_dataset }}
 
   - name: Setup ZFS datasets
     become: yes

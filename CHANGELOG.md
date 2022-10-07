@@ -1,3 +1,9 @@
+0.17
+
+* Working cli minio bucket setup
+
+---
+
 0.16
 
 * Trying different setup with minio commands for insecure flag
