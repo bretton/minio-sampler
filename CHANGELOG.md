@@ -1,3 +1,9 @@
+0.18
+
+* Fixed JSON formatting for consul agent.json
+
+---
+
 0.17
 
 * Working cli minio bucket setup

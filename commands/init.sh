@@ -1162,29 +1162,31 @@ cat >site.yml<<"EOF"
     copy:
       dest: /usr/local/etc/consul.d/agent.json
       content: |
-        "bind_addr": "{{ minio1_ip_address }}",
-        "server": false,
-        "node_name": "{{ minio1_hostname }}",
-        "datacenter": "{{ datacenter_name }}",
-        "log_level": "WARN",
-        "data_dir": "/var/db/consul",
-        "verify_incoming": false,
-        "verify_outgoing": false,
-        "verify_server_hostname": false,
-        "verify_incoming_rpc": false,
-        "encrypt": "{{ gossip_key }}",
-        "enable_syslog": true,
-        "leave_on_terminate": true,
-        "start_join": [
+        {
+          "bind_addr": "{{ minio1_ip_address }}",
+          "server": false,
+          "node_name": "{{ minio1_hostname }}",
+          "datacenter": "{{ datacenter_name }}",
+          "log_level": "WARN",
+          "data_dir": "/var/db/consul",
+          "verify_incoming": false,
+          "verify_outgoing": false,
+          "verify_server_hostname": false,
+          "verify_incoming_rpc": false,
+          "encrypt": "{{ gossip_key }}",
+          "enable_syslog": true,
+          "leave_on_terminate": true,
+          "start_join": [
             "{{ consul_ip }}"
-        ],
-        "telemetry": {
+          ],
+          "telemetry": {
             "prometheus_retention_time": "24h"
-        },
-        "service": {
+          },
+          "service": {
             "name": "node-exporter",
             "tags": ["_app=host-server", "_service=node-exporter", "_hostname={{ minio1_hostname }}", "_datacenter={{ datacenter_name }}"],
             "port": 9100
+          }
         }
 
   - name: Set consul agent.json permissions
@@ -1701,29 +1703,31 @@ cat >site.yml<<"EOF"
     copy:
       dest: /usr/local/etc/consul.d/agent.json
       content: |
-        "bind_addr": "{{ minio2_ip_address }}",
-        "server": false,
-        "node_name": "{{ minio2_hostname }}",
-        "datacenter": "{{ datacenter_name }}",
-        "log_level": "WARN",
-        "data_dir": "/var/db/consul",
-        "verify_incoming": false,
-        "verify_outgoing": false,
-        "verify_server_hostname": false,
-        "verify_incoming_rpc": false,
-        "encrypt": "{{ gossip_key }}",
-        "enable_syslog": true,
-        "leave_on_terminate": true,
-        "start_join": [
-          "{{ consul_ip }}"
-        ],
-        "telemetry": {
-          "prometheus_retention_time": "24h"
-        },
-        "service": {
-          "name": "node-exporter",
-          "tags": ["_app=host-server", "_service=node-exporter", "_hostname={{ minio2_hostname }}", "_datacenter={{ datacenter_name }}"],
-          "port": 9100
+        {
+          "bind_addr": "{{ minio2_ip_address }}",
+          "server": false,
+          "node_name": "{{ minio2_hostname }}",
+          "datacenter": "{{ datacenter_name }}",
+          "log_level": "WARN",
+          "data_dir": "/var/db/consul",
+          "verify_incoming": false,
+          "verify_outgoing": false,
+          "verify_server_hostname": false,
+          "verify_incoming_rpc": false,
+          "encrypt": "{{ gossip_key }}",
+          "enable_syslog": true,
+          "leave_on_terminate": true,
+          "start_join": [
+            "{{ consul_ip }}"
+          ],
+          "telemetry": {
+            "prometheus_retention_time": "24h"
+          },
+          "service": {
+            "name": "node-exporter",
+            "tags": ["_app=host-server", "_service=node-exporter", "_hostname={{ minio2_hostname }}", "_datacenter={{ datacenter_name }}"],
+            "port": 9100
+          }
         }
 
   - name: Set consul agent.json permissions
