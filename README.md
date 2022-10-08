@@ -29,6 +29,9 @@ To create your own sampler, init the VMs:
     cd mysample
     minsampler packbox
     minsampler startvms
+      vagrant ssh minio1
+      OR
+      open http://ACCESSIP
     ...
     minsampler status
     ...
@@ -78,7 +81,7 @@ vi /usr/local/etc/vbox/networks.conf
 * 0.0.0.0/0
 ```
 
-Symlink to expected file (may be fixed in future [1](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=266845#c2))
+Symlink to expected file ([may be fixed in future](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=266845#c2))
 ```
 mkdir -p /etc/vbox
 ln -s /usr/local/etc/vbox/networks.conf /etc/vbox/networks.conf
