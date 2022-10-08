@@ -1,3 +1,11 @@
+0.23
+
+* Fix pot.conf
+* Disable coredumps
+* enable sysctl values for jails to allow ping
+
+---
+
 0.22
 
 * Add strategic continues

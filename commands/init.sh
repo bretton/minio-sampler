@@ -194,7 +194,7 @@ cat >site.yml<<"EOF"
       consul_ip: 10.100.1.10
       consul_nodename: consul
       consul_bootstrap: 1
-      consul_peers: ""
+      consul_peers: 1.2.3.4
       nomad_base: nomad-server-amd64-13_1
       nomad_version: 2.0.16
       nomad_pot_name: nomad-server-amd64-13_1_2_0_16
@@ -257,6 +257,11 @@ cat >site.yml<<"EOF"
       port: 22
       delay: 2
 
+  - name: Disable coredumps
+    sysctl:
+      name: kern.coredump
+      value: '0'
+
   - name: Enable root ssh logins and set keep alives
     become: yes
     become_user: root
@@ -316,6 +321,12 @@ cat >site.yml<<"EOF"
     become_user: root
     shell:
       cmd: "pkg upgrade -qy pkg"
+
+  - name: Force package update
+    become: yes
+    become_user: root
+    shell:
+      cmd: "pkg update -fq"
 
   - name: Upgrade packages
     become: yes
@@ -1126,7 +1137,10 @@ cat >site.yml<<"EOF"
       content: |
         POT_ZFS_ROOT=zroot/srv/pot
         POT_FS_ROOT=/mnt/srv/pot
-        POT_EXTIF=vtnet
+        POT_NETWORK=10.192.0.0/10
+        POT_NETMASK=255.192.0.0
+        POT_GATEWAY=10.192.0.1
+        POT_EXTIF=vtnet1
 
   - name: Init pot and enable service
     become: yes
@@ -2093,6 +2107,7 @@ Vagrant.configure("2") do |config|
       sysrc ifconfig_vtnet2="inet ${ACCESSIP} netmask 255.255.255.0"
       sysctl -w net.inet.tcp.msl=3000
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
+      echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
       echo 'interface "vtnet1" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
       service netif restart && service routing restart
       ping -c 1 google.com
@@ -2152,6 +2167,7 @@ Vagrant.configure("2") do |config|
       sysrc ifconfig_vtnet1="inet ${NETWORK}.4 netmask 255.255.255.0"
       sysctl -w net.inet.tcp.msl=3000
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
+      echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
       echo 'interface "vtnet1" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
       service netif restart && service routing restart
       ping -c 1 google.com
