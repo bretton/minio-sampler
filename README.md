@@ -169,20 +169,6 @@ minsampler startvms
         status      -- Show status
         stopvms     -- Stop VMs
 
-## Minio Dashboard
-
-The Minio web interface is available via nginx reverse proxy at https://ACCESSIP:19000 for the IP address set in ACCESSIP variable of `config.ini`.
-
-Accept the self-signed certificate TWICE. First is for nginx, second minio. Remember, this is not a production-ready environment. 
-
-Login with user `sampler` and `samplerpasswordislong` to access the dashboard.
-
-You can now create a bucket and explore settings.
-
-## Grafana Dashboard
-
-The Grafana web interface is available via nginx reverse proxy at https://ACCESSIP:3000 for the IP address set in ACCESSIP variable of `config.ini`.
-
 ## config.ini
 
 ### Access IP
@@ -203,5 +189,27 @@ Do not add the metric M, or MB or GB! It won't work.
 
 Eight (8) virtual drives will be created of this size, so ensure you have sufficient disk space!
 
-A basic check is done to see if the input figures can be catered to, on init.
+A basic check is done to see if the input figures can be catered to, on running `minsampler init <name>`.
+
+## Dashboards
+
+The default dashboard with links to all the included tools is `http://ACCESSIP`. There is a default index.html with links.
+
+Where `https` is applicable, please accept the self-signed certificate. You might need to do this twice, even refresh, to get the minio dashboard.
+
+### Minio Dashboard
+
+The Minio web interface is available via nginx reverse proxy at `https://ACCESSIP:19000` for the IP address set in ACCESSIP variable of `config.ini`.
+
+Accept the self-signed certificate TWICE. First is for nginx, second minio. Remember, this is not a production-ready environment. 
+
+Login with user `sampler` and `samplerpasswordislong` to access the dashboard.
+
+You can now create a bucket and explore settings.
+
+### Grafana Dashboard
+
+The Grafana web interface is available via nginx reverse proxy at `http://ACCESSIP:3000` for the IP address set in ACCESSIP variable of `config.ini`.
+
+
 

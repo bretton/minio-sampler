@@ -1,3 +1,9 @@
+0.20
+
+* Update README
+
+---
+
 0.19
 
 * Update README with increased server specs
