@@ -1,3 +1,9 @@
+0.24
+
+* Split detailed install steps to own document
+
+---
+
 0.23
 
 * Fix pot.conf
