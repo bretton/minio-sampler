@@ -187,8 +187,8 @@ cat >site.yml<<"EOF"
       datacenter_name: samplerdc
       gossip_key: "BBtPyNSRI+/iP8RHB514CZ5By3x1jJLu4SqTVzM4gPA="
       consul_base: consul-amd64-13_1
-      consul_version: 2.0.21
-      consul_pot_name: consul-amd64-13_1_2_0_21
+      consul_version: 2.0.22
+      consul_pot_name: consul-amd64-13_1_2_0_22
       consul_clone_name: consul-clone
       consul_url: https://potluck.honeyguide.net/consul
       consul_ip: 10.100.1.10

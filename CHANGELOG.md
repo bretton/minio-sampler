@@ -1,3 +1,10 @@
+0.19
+
+* Update README with increased server specs
+* Update consul pot image version with optional PEERS
+
+---
+
 0.18
 
 * Fixed JSON formatting for consul agent.json

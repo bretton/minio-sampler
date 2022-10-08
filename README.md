@@ -11,7 +11,7 @@ This will bring up 2 minio servers:
 * minio2 (4CPU, 4GB, 4 attached disks)
 
 # Requirements
-The host computer running `minio-sampler` needs at least 8 CPU threads, 8GB memory, plus 50GB disk space, preferably high speed SSD.
+The host computer running `minio-sampler` needs at least 16 CPU threads, 16GB memory, plus 50GB disk space, preferably high speed SSD. The setup takes an hour or so with packbox step included.
 
 # Overview
 
