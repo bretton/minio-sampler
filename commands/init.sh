@@ -187,8 +187,8 @@ cat >site.yml<<"EOF"
       datacenter_name: samplerdc
       gossip_key: "BBtPyNSRI+/iP8RHB514CZ5By3x1jJLu4SqTVzM4gPA="
       consul_base: consul-amd64-13_1
-      consul_version: 2.0.22
-      consul_pot_name: consul-amd64-13_1_2_0_22
+      consul_version: 2.0.23
+      consul_pot_name: consul-amd64-13_1_2_0_23
       consul_clone_name: consul-clone
       consul_url: https://potluck.honeyguide.net/consul
       consul_ip: 10.100.1.10
@@ -1137,6 +1137,8 @@ cat >site.yml<<"EOF"
       content: |
         POT_ZFS_ROOT=zroot/srv/pot
         POT_FS_ROOT=/mnt/srv/pot
+        POT_CACHE=/var/cache/pot
+        POT_TMP=/tmp
         POT_NETWORK=10.192.0.0/10
         POT_NETMASK=255.192.0.0
         POT_GATEWAY=10.192.0.1

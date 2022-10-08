@@ -1,3 +1,9 @@
+0.25
+
+* Version bump on consul image
+
+---
+
 0.24
 
 * Split detailed install steps to own document
