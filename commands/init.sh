@@ -1339,6 +1339,11 @@ cat >site.yml<<"EOF"
       cmd: |
         pot import -p {{ consul_base }} -t {{ consul_version }} -U {{ consul_url }}
 
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
+
   - name: setup and start the consul pot image
     become: yes
     become_user: root
@@ -1371,12 +1376,22 @@ cat >site.yml<<"EOF"
       name: consul
       state: restarted
 
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
+
   - name: download the nomad pot image
     become: yes
     become_user: root
     shell:
       cmd: |
         pot import -p {{ nomad_base }} -t {{ nomad_version }} -U {{ nomad_url }}
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
 
   - name: setup and start the nomad pot image
     become: yes
@@ -1410,12 +1425,22 @@ cat >site.yml<<"EOF"
       name: nomad
       state: restarted
 
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
+
   - name: download the traefik pot image
     become: yes
     become_user: root
     shell:
       cmd: |
         pot import -p {{ traefik_base }} -t {{ traefik_version }} -U {{ traefik_url }}
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
 
   - name: setup and start the traefik pot image
     become: yes
@@ -1447,6 +1472,11 @@ cat >site.yml<<"EOF"
     shell:
       cmd: |
         pot import -p {{ mariadb_base }} -t {{ mariadb_version }} -U {{ mariadb_url }}
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
 
   - name: setup and start the mariadb pot image
     become: yes
@@ -1485,6 +1515,11 @@ cat >site.yml<<"EOF"
     shell:
       cmd: |
         pot import -p {{ beast_base }} -t {{ beast_version }} -U {{ beast_url }}
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
 
   - name: setup and start the mariadb pot image
     become: yes
@@ -1647,6 +1682,11 @@ cat >site.yml<<"EOF"
         service syslog-ng enable
         sysrc syslog_ng_flags="-R /tmp/syslog-ng.persist" 
         service syslog-ng restart
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
 
 - hosts: minio2
   gather_facts: yes

@@ -1,3 +1,9 @@
+0.22
+
+* Add strategic continues
+
+---
+
 0.21
 
 * Update README some more
