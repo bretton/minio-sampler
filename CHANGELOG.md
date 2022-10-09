@@ -1,3 +1,10 @@
+0.26
+
+* Patch pot common.sh
+* because https://github.com/bsdpot/pot/commit/f033266a26ecd144dc047bb7f35929112407dfc0
+
+---
+
 0.25
 
 * Version bump on consul image

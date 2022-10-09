@@ -1129,6 +1129,14 @@ cat >site.yml<<"EOF"
       port: 22
       delay: 2
 
+  - name: HOTFIX temp fix to patch pot common.sh
+    become: yes
+    become_user: root
+    shell:
+      cmd: |
+        fetch -o /tmp/common.sh.in "https://raw.githubusercontent.com/bsdpot/pot/f033266a26ecd144dc047bb7f35929112407dfc0/share/pot/common.sh"
+        cp -f /tmp/common.sh.in /usr/local/share/pot/common.sh
+
   - name: Setup pot.conf
     become: yes
     become_user: root
@@ -1144,13 +1152,19 @@ cat >site.yml<<"EOF"
         POT_GATEWAY=10.192.0.1
         POT_EXTIF=vtnet1
 
-  - name: Init pot and enable service
+  - name: Initiate pot
     become: yes
     become_user: root
     shell:
       cmd: |
         pot init -v
-        service pot enable
+
+  - name: Enable pot
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: pot
+      enabled: yes
 
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:
