@@ -1,3 +1,9 @@
+0.27
+
+* Fix nginx reverse proxy setup
+
+---
+
 0.26
 
 * Patch pot common.sh

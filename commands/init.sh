@@ -779,7 +779,7 @@ cat >site.yml<<"EOF"
             }
           }
           server {
-            listen 3000;
+            listen 13000;
             server_name {{ minio1_hostname }};
             ignore_invalid_headers off;
             client_max_body_size 0;
@@ -793,11 +793,11 @@ cat >site.yml<<"EOF"
               proxy_set_header Connection "";
               chunked_transfer_encoding off;
               proxy_buffering off;
-              proxy_pass http://{{ minio_nat_gateway }}:10903;
+              proxy_pass http://{{ beast_ip }}:3000;
             }
           }
           server {
-            listen 9090;
+            listen 19090;
             server_name {{ minio1_hostname }};
             ignore_invalid_headers off;
             client_max_body_size 0;
@@ -811,11 +811,11 @@ cat >site.yml<<"EOF"
               proxy_set_header Connection "";
               chunked_transfer_encoding off;
               proxy_buffering off;
-              proxy_pass http://{{ minio_nat_gateway }}:10904;
+              proxy_pass http://{{ beast_ip }}:9090;
             }
           }
           server {
-            listen 9093;
+            listen 19093;
             server_name {{ minio1_hostname }};
             ignore_invalid_headers off;
             client_max_body_size 0;
@@ -829,11 +829,11 @@ cat >site.yml<<"EOF"
               proxy_set_header Connection "";
               chunked_transfer_encoding off;
               proxy_buffering off;
-              proxy_pass http://{{ minio_nat_gateway }}:10905;
+              proxy_pass http://{{ beast_ip }}:9093;
             }
           }
           server {
-            listen 4646;
+            listen 14646;
             server_name {{ minio1_hostname }};
             ignore_invalid_headers off;
             client_max_body_size 0;
@@ -847,11 +847,11 @@ cat >site.yml<<"EOF"
               proxy_set_header Connection "";
               chunked_transfer_encoding off;
               proxy_buffering off;
-              proxy_pass http://{{ minio_nat_gateway }}:10907;
+              proxy_pass http://{{ nomad_ip }}:4646;
             }
           }
           server {
-            listen 8500;
+            listen 18500;
             server_name {{ minio1_hostname }};
             ignore_invalid_headers off;
             client_max_body_size 0;
@@ -865,11 +865,11 @@ cat >site.yml<<"EOF"
               proxy_set_header Connection "";
               chunked_transfer_encoding off;
               proxy_buffering off;
-              proxy_pass http://{{ minio_nat_gateway }}:10908;
+              proxy_pass http://{{ consul_ip }}:8500;
             }
           }
           server {
-            listen 9002;
+            listen 19002;
             server_name {{ minio1_hostname }};
             ignore_invalid_headers off;
             client_max_body_size 0;
@@ -883,11 +883,11 @@ cat >site.yml<<"EOF"
               proxy_set_header Connection "";
               chunked_transfer_encoding off;
               proxy_buffering off;
-              proxy_pass http://{{ minio_nat_gateway }}:10909;
+              proxy_pass http://{{ traefik_ip }}:9002;
             }
           }
           server {
-            listen 443 ssl;
+            listen 10443 ssl;
             ssl_certificate {{ local_openssl_dir }}/{{ local_openssl_nginx_cert }};
             ssl_certificate_key {{ local_openssl_dir }}/{{ local_openssl_private_key }};
             server_name {{ minio1_hostname }};
@@ -938,14 +938,14 @@ cat >site.yml<<"EOF"
         <h1>Welcome to minio-sampler!</h1>
         <p>Please choose from the following:</p>
         <ul>
-          <li><a href="https://{{ minio_nat_gateway }}:19000">Minio dashboard</a></li>
-          <li><a href="http://{{ minio_nat_gateway }}:3000">Grafana</a></li>
-          <li><a href="http://{{ minio_nat_gateway }}:9090">Prometheus</a></li>
-          <li><a href="http://{{ minio_nat_gateway }}:9093">Alertmanager</a></li>
-          <li><a href="http://{{ minio_nat_gateway }}:4646">Nomad</a></li>
-          <li><a href="http://{{ minio_nat_gateway }}:8500">Consul</a></li>
-          <li><a href="http://{{ minio_nat_gateway }}:9002">Traefik</a></li>
-          <li><a href="http://{{ minio_nat_gateway }}:29000">Nextcloud</a></li>
+          <li><a href="https://{{ minio_access_ip }}:19000">Minio dashboard</a></li>
+          <li><a href="http://{{ minio_access_ip }}:13000">Grafana</a></li>
+          <li><a href="http://{{ minio_access_ip }}:19090">Prometheus</a></li>
+          <li><a href="http://{{ minio_access_ip }}:19093">Alertmanager</a></li>
+          <li><a href="http://{{ minio_access_ip }}:14646">Nomad</a></li>
+          <li><a href="http://{{ minio_access_ip }}:18500">Consul</a></li>
+          <li><a href="http://{{ minio_access_ip }}:19002">Traefik</a></li>
+          <li><a href="https://{{ minio_access_ip }}:10443">Nextcloud</a></li>
         </ul>
         </body>
         </html>
@@ -2108,7 +2108,7 @@ Vagrant.configure("2") do |config|
     node.vm.network :forwarded_port, guest: 3000, host_ip: "${NETWORK}.1", host: 10903, id: "minio1-grafana"
     node.vm.network :forwarded_port, guest: 9090, host_ip: "${NETWORK}.1", host: 10904, id: "minio1-prometheus"
     node.vm.network :forwarded_port, guest: 9093, host_ip: "${NETWORK}.1", host: 10905, id: "minio1-alertmanager"
-    node.vm.network :forwarded_port, guest: 29000, host_ip: "${NETWORK}.1", host: 10906, id: "minio1-nextcloud"
+    node.vm.network :forwarded_port, guest: 10443, host_ip: "${NETWORK}.1", host: 10906, id: "minio1-nextcloud"
     node.vm.network :forwarded_port, guest: 4646, host_ip: "${NETWORK}.1", host: 10907, id: "minio1-nomad"
     node.vm.network :forwarded_port, guest: 8500, host_ip: "${NETWORK}.1", host: 10908, id: "minio1-consul"
     node.vm.network :forwarded_port, guest: 9002, host_ip: "${NETWORK}.1", host: 10909, id: "minio1-traefik"
