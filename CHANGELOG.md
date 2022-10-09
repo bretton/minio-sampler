@@ -1,3 +1,9 @@
+0.29
+
+* Bug fixes, prepare db and nextcloud not copied over
+
+---
+
 0.28
 
 * Configure for nextcloud

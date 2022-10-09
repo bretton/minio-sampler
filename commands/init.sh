@@ -1726,11 +1726,11 @@ cat >site.yml<<"EOF"
       port: 22
       delay: 2
 
-  - name: Copy over script to prepare database
+  - name: Copy over preparedatabase.sh script
     become: yes
     become_user: root
     copy:
-      dest: /root/preparedatabase.sh
+      dest: "/root/preparedatabase.sh"
       content: |
         #!/bin/sh
         idmariadb=$(jls | grep {{ mariadb_clone_name }} | cut -c 1-8 |sed 's/[[:blank:]]*$//')
@@ -1747,21 +1747,21 @@ cat >site.yml<<"EOF"
       owner: root
       group: wheel
 
-  - name: Copy over script to prepare nextcloud
+  - name: Copy over preparenextcloud.sh script
     become: yes
     become_user: root
     copy:
-      dest: /root/preparenextcloud.sh
+      dest: "/root/preparenextcloud.sh"
       content: |
         #!/bin/sh
         idnextcloud=$(jls | grep nextcloud | cut -c 1-8 |sed 's/[[:blank:]]*$//')
         jexec -U root "$idnextcloud" su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:install \
-         --database "mysql" \
-         --database-name "{{ mariadb_nc_db_name }}" \
-         --database-user "{{ mariadb_nc_user }}" \
-         --database-pass "{{ mariadb_nc_pass }}" \
-         --admin-user "{{ nextcloud_admin_user }}" \
-         --admin-pass "{{ nextcloud_admin_pass }}"'
+          --database "mysql" \
+          --database-name "{{ mariadb_nc_db_name }}" \
+          --database-user "{{ mariadb_nc_user }}" \
+          --database-pass "{{ mariadb_nc_pass }}" \
+          --admin-user "{{ nextcloud_admin_user }}" \
+          --admin-pass "{{ nextcloud_admin_pass }}"'
 
   - name: Set preparenextcloud.sh permissions
     ansible.builtin.file:
