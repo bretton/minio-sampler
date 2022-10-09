@@ -1,3 +1,9 @@
+0.28
+
+* Configure for nextcloud
+
+---
+
 0.27
 
 * Fix nginx reverse proxy setup

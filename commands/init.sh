@@ -203,7 +203,9 @@ cat >site.yml<<"EOF"
       nomad_nodename: nomad
       nomad_url: https://potluck.honeyguide.net/nomad-server
       nomad_bootstrap: 1
-      nomad_importjobs: 0
+      nomad_importjobs: 1
+      nomad_job_src: /root/nomadjobs/nextcloud.nomad
+      nomad_job_dest: /root/nextcloud.nomad
       traefik_base: traefik-consul-amd64-13_1
       traefik_version: 1.3.1
       traefik_pot_name: traefik-consul-amd64-13_1_1_3_1
@@ -251,6 +253,22 @@ cat >site.yml<<"EOF"
       mariadb_scrapepass: sampler
       mariadb_dumpfile: /var/db/mysql/full_mariadb_backup.sql
       mariadb_dumpschedule: "5 21 * * *"
+      mariadb_nc_db_name: nextcloud
+      mariadb_nc_user: nextcloud
+      mariadb_nc_pass: mynextcloud1345swdwfr3t34rw
+      nextcloud_mount: /mnt/nextcloud
+      nextcloud_minio: "10.100.1.3:9000"
+      nextcloud_copy_src: /root/nomadjobs/nc-config.php.in
+      nextcloud_copy_dest: /root/nc-config.php
+      nextcloud_base: nextcloud-nginx-nomad-amd64-13_1
+      nextcloud_version: 0.37
+      nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
+      nextcloud_www_src: /mnt/data/jaildata/nextcloud/nextcloud_www
+      nextcloud_www_dest: /usr/local/www/nextcloud
+      nextcloud_storage_src: /mnt/data/jaildata/nextcloud/storage
+      nextcloud_storage_dest:  /mnt/nextcloud
+      nextcloud_admin_user: sampler
+      nextcloud_admin_pass: sampler123
 
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:
@@ -1110,6 +1128,9 @@ cat >site.yml<<"EOF"
         zfs create -o mountpoint=/mnt/data/jaildata/beast zroot/data/jaildata/beast
         zfs create -o mountpoint=/mnt/data/jaildata/mariadb zroot/data/jaildata/mariadb
         mkdir -p /mnt/data/jaildata/mariadb/var_db_mysql
+        zfs create -o mountpoint=/mnt/data/jaildata/nextcloud zroot/data/jaildata/nextcloud
+        mkdir -p /mnt/data/jaildata/nextcloud/nextcloud_www
+        mkdir -p /mnt/data/jaildata/nextcloud/storage
 
   - name: Install needed packages
     become: yes
@@ -1411,6 +1432,166 @@ cat >site.yml<<"EOF"
       port: 22
       delay: 2
 
+  - name: Make nomadjobs directory
+    become: yes
+    become_user: root
+    shell:
+      cmd: |
+        mkdir -p /root/nomadjobs
+
+  - name: Setup nextcloud.nomad
+    become: yes
+    become_user: root
+    copy:
+      dest: {{ nomad_job_src }}
+      content: |
+        job "nextcloud" {
+          constraint {
+            attribute = "${attr.unique.network.ip-address}"
+            value     = "{{ minio1_ip_address }}"
+          }
+          datacenters = ["{{ datacenter_name }}"]
+          type        = "service"
+          group "group1" {
+            count = 1 
+            network {
+              port "http" {
+                static = 10443
+              }
+            }
+            task "nextcloud1" {
+              driver = "pot"
+              restart {      
+                attempts = 3      
+                delay    = "30s"    
+              }
+              service {
+                tags = ["nginx", "www", "nextcloud"]
+                name = "nextcloud-server"
+                port = "http"
+                  check {
+                    type     = "tcp"
+                    name     = "tcp"
+                    interval = "60s"
+                    timeout  = "30s"
+                  }
+                  check_restart {
+                    limit = 0
+                    grace = "120s"
+                    ignore_warnings = false
+                  }
+              }
+              config {
+                image = "{{ nextcloud_url }}"
+                pot = "{{ nextcloud_base }}"
+                tag = "{{ nextcloud_version }}"
+                command = "/usr/local/bin/cook"
+                args = ["-d","{{ nextcloud_mount }}","-s","{{ nextcloud_minio }}"]
+                copy = [
+                  "{{ nextcloud_copy_src }}:{{ nextcloud_copy_dest }}",
+                ]
+                mount = [
+                  "{{ nextcloud_www_src }}:{{ nextcloud_www_dest }}",
+                  "{{ nextcloud_storage_src }}:{{ nextcloud_storage_dest }}",
+                ]
+                port_map = {
+                  http = "80"
+                }
+              }
+              resources {
+                cpu = 1000
+                memory = 2000
+              }
+            }
+          }
+        }
+
+  - name: Setup nc-config.php
+    become: yes
+    become_user: root
+    copy:
+      dest: {{ nextcloud_copy_src }}
+      content: |
+        <?php
+        $CONFIG = array (
+          'instanceid' => '',
+          'passwordsalt' => '',
+          'secret' => '',
+          'trusted_domains' => 
+          array (
+            0 => 'nextcloud.{{ minio1_hostname }}',
+            1 => '{{ minio1_ip_address }}:10443',
+            2 => '{{ minio1_ip_address }}:9000',
+            3 => '{{ minio_access_ip }}:10443,
+          ),
+          'objectstore' =>
+           array (
+            'class' => 'OC\\Files\\ObjectStore\\S3',
+            'arguments' => array (
+              'bucket' => '{{ minio_dataset }}', // your bucket name
+              'autocreate' => true,
+              'key'    => '{{ minio_access_key }}', // your key
+              'secret' => '{{ minio_access_password }}', // your secret
+              'use_ssl' => true,
+              'region' => '',
+              'hostname' => '{{ minio1_ip_address }}',
+              'port' => '9000',
+              'use_path_style' => true,
+            ),
+          ),
+          'datadirectory' => '{{ nextcloud_storage_dest }}',
+          'loglevel' => 1,
+          'logfile' => '{{ nextcloud_storage_dest }}/nextcloud.log',
+          'memcache.local' => '\\OC\\Memcache\\APCu',
+          'filelocking.enabled' => false,
+          'overwrite.cli.url' => '',
+          'overwritehost' => '',
+          'overwriteprotocol' => 'https',
+          'dbtype' => 'mysql',
+          'version' => '23.0.5.1',
+          'dbname' => '{{ mariadb_nc_db_name }}',
+          'dbhost' => '{{ mariadb_ip }}',
+          'dbport' => '3306',
+          'dbtableprefix' => 'oc_',
+          'dbuser' => '{{ mariadb_nc_user }}',
+          'dbpassword' => '{{ mariadb_nc_pass }}',
+          'installed' => true,
+          'mail_from_address' => 'nextcloud',
+          'mail_smtpmode' => 'smtp',
+          'mail_smtpauthtype' => 'PLAIN',
+          'mail_domain' => '{{ minio1_hostname }}',
+          'mail_smtphost' => '',
+          'mail_smtpport' => '',
+          'mail_smtpauth' => 1,
+          'maintenance' => false,
+          'theme' => '',
+          'twofactor_enforced' => 'false',
+          'twofactor_enforced_groups' => 
+          array (
+          ),
+          'twofactor_enforced_excluded_groups' => 
+          array (
+            0 => 'no_2fa',
+          ),
+          'updater.release.channel' => 'stable',
+          'ldapIgnoreNamingRules' => false,
+          'ldapProviderFactory' => 'OCA\\User_LDAP\\LDAPProviderFactory',
+          'encryption_skip_signature_check' => true,
+          'encryption.key_storage_migrated' => false,
+          'mysql.utf8mb4' => true,
+          'mail_sendmailmode' => 'smtp',
+          'mail_smtpname' => 'nextcloud@{{ minio1_hostname }}',
+          'mail_smtppassword' => '',
+          'mail_smtpsecure' => 'ssl',
+          'app.mail.verify-tls-peer' => false,
+          'app_install_overwrite' => 
+          array (
+            0 => 'camerarawpreviews',
+            1 => 'keeweb',
+            2 => 'calendar',
+          ),
+        );
+
   - name: download the nomad pot image
     become: yes
     become_user: root
@@ -1431,6 +1612,12 @@ cat >site.yml<<"EOF"
         pot clone -P {{ nomad_pot_name }} \
           -p {{ nomad_clone_name }} \
           -N alias -i "vtnet1|{{ nomad_ip }}"
+        pot copy-in -p {{ nomad_clone_name }} \
+          -s {{ nomad_job_src }} \
+          -d {{ nomad_job_dest }}
+        pot copy-in -p {{ nomad_clone_name }} \
+          -s {{ nextcloud_copy_src }} \
+          -d {{ nextcloud_copy_dest }}
         pot set-env -p {{ nomad_clone_name }} \
           -E NODENAME={{ nomad_nodename }} \
           -E DATACENTER={{ datacenter_name }} \
@@ -1533,6 +1720,55 @@ cat >site.yml<<"EOF"
           -E REMOTELOG="{{ beast_ip }}"
         pot set-attr -p {{ mariadb_clone_name }} -A start-at-boot -V True
         pot start {{ mariadb_clone_name }}
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
+
+  - name: Copy over script to prepare database
+    become: yes
+    become_user: root
+    copy:
+      dest: /root/preparedatabase.sh
+      content: |
+        #!/bin/sh
+        idmariadb=$(jls | grep {{ mariadb_clone_name }} | cut -c 1-8 |sed 's/[[:blank:]]*$//')
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "DROP DATABASE IF EXISTS {{ mariadb_nc_db_name }}"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE DATABASE {{ mariadb_nc_db_name }}"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER '{{ mariadb_nc_user }}'@'10.%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on {{ mariadb_nc_db_name }}.* to '{{ mariadb_nc_user }}'@'10.%'"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "FLUSH PRIVILEGES"
+
+  - name: Set preparedatabase.sh permissions
+    ansible.builtin.file:
+      path: "/root/preparedatabase.sh"
+      mode: '0755'
+      owner: root
+      group: wheel
+
+  - name: Copy over script to prepare nextcloud
+    become: yes
+    become_user: root
+    copy:
+      dest: /root/preparenextcloud.sh
+      content: |
+        #!/bin/sh
+        idnextcloud=$(jls | grep nextcloud | cut -c 1-8 |sed 's/[[:blank:]]*$//')
+        jexec -U root "$idnextcloud" su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:install \
+         --database "mysql" \
+         --database-name "{{ mariadb_nc_db_name }}" \
+         --database-user "{{ mariadb_nc_user }}" \
+         --database-pass "{{ mariadb_nc_pass }}" \
+         --admin-user "{{ nextcloud_admin_user }}" \
+         --admin-pass "{{ nextcloud_admin_pass }}"'
+
+  - name: Set preparenextcloud.sh permissions
+    ansible.builtin.file:
+      path: "/root/preparenextcloud.sh"
+      mode: '0755'
+      owner: root
+      group: wheel
 
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:
