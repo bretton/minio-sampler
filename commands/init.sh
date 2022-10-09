@@ -1964,9 +1964,7 @@ cat >site.yml<<"EOF"
     shell:
       cmd: |
         zfs create -o mountpoint=/mnt/srv zroot/srv
-        zfs create -o mountpoint=/mnt/srv/pot zroot/srv/pot
         zfs create -o mountpoint=/mnt/data zroot/data
-        zfs create -o mountpoint=/mnt/data/jaildata zroot/data/jaildata
 
   - name: Install needed packages
     become: yes
@@ -1974,8 +1972,6 @@ cat >site.yml<<"EOF"
     ansible.builtin.package:
       name:
         - consul
-        - nomad
-        - nomad-pot-driver
         - node_exporter
       state: present
 
@@ -2077,99 +2073,7 @@ cat >site.yml<<"EOF"
         sysrc node_exporter_user=nodeexport
         sysrc node_exporter_group=nodeexport
         service node_exporter restart
-
-  - name: Wait for port 22 to become open, wait for 2 seconds
-    wait_for:
-      port: 22
-      delay: 2
-
-  - name: Setup nomad client.hcl minio2
-    become: yes
-    become_user: root
-    copy:
-      dest: /usr/local/etc/nomad/client.hcl
-      content: |
-        bind_addr = "{{ minio2_ip_address }}"
-        datacenter = "{{ datacenter_name }}"
-        client {
-          enabled = true
-          options {
-          "driver.raw_exec.enable" = "1"
-          }
-        servers = ["{{ nomad_ip }}"]
-        }
-        plugin_dir = "/usr/local/libexec/nomad/plugins"
-        consul {
-          address = "127.0.0.1:8500"
-          client_service_name = "{{ minio2_hostname }}"
-          auto_advertise = true
-          client_auto_join = true
-        }
-        telemetry {
-          publish_allocation_metrics = true
-          publish_node_metrics = true
-          prometheus_metrics = true
-          disable_hostname = true
-        }
-        enable_syslog=true
-        log_level="DEBUG"
-        syslog_facility="LOCAL1"
-
-  - name: Set nomad client.hcl permissions
-    ansible.builtin.file:
-      path: "/usr/local/etc/nomad/client.hcl"
-      mode: '0644'
-      owner: consul
-      group: wheel
-
-  - name: Remove nomad server.hcl
-    become: yes
-    become_user: root
-    shell:
-      cmd: |
-        rm -r /usr/local/etc/nomad/server.hcl
-
-  - name: Set nomad tmp permissions
-    ansible.builtin.file:
-      path: "/var/tmp/nomad"
-      state: directory
-      mode: '0700'
-      owner: root
-      group: wheel
-  
-  - name: setup nomad client log file
-    become: yes
-    become_user: root
-    shell:
-      cmd: |
-        mkdir -p /var/log/nomad
-        touch /var/log/nomad/nomad.log
-
-  - name: setup nomad client sysrc entries
-    become: yes
-    become_user: root
-    shell:
-      cmd: |
-        sysrc nomad_user="root"
-        sysrc nomad_group="wheel"
-        sysrc nomad_env="PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:/bin"
-        sysrc nomad_args="-config=/usr/local/etc/nomad/client.hcl"
-        sysrc nomad_debug="YES"
-
-  - name: Enable nomad
-    become: yes
-    become_user: root
-    ansible.builtin.service:
-      name: nomad
-      enabled: yes
-
-  - name: Start nomad
-    become: yes
-    become_user: root
-    ansible.builtin.service:
-      name: nomad
-      state: started
-
+ 
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:
       port: 22

@@ -1,3 +1,10 @@
+0.33
+
+* Remove nomad-client from minio2, only run nomad jobs on minio1
+* Remove unnecessary ZFS datasets from minio2
+
+---
+
 0.32
 
 * Remove host constraint for nomad job
