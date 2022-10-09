@@ -1733,7 +1733,7 @@ cat >site.yml<<"EOF"
       dest: /root/preparedatabase.sh
       content: |
         #!/bin/sh
-        idmariadb=$(jls | grep {{ mariadb_clone_name }} | cut -c 1-8 |sed 's/[[:blank:]]*$//')
+        idmariadb=$(jls | grep {{ mariadb_clone_name }} | cut -c 1-8 | sed 's/[[:blank:]]*$//')
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "DROP DATABASE IF EXISTS {{ mariadb_nc_db_name }}"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE DATABASE {{ mariadb_nc_db_name }}"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER '{{ mariadb_nc_user }}'@'10.%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"

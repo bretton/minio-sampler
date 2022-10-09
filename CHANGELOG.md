@@ -1,3 +1,9 @@
+0.31
+
+* Cosmetic code fixes
+
+---
+
 0.30
 
 * Additional hotfixes
