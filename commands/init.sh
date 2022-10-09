@@ -1522,7 +1522,7 @@ cat >site.yml<<"EOF"
             0 => 'nextcloud.{{ minio1_hostname }}',
             1 => '{{ minio1_ip_address }}:10443',
             2 => '{{ minio1_ip_address }}:9000',
-            3 => '{{ minio_access_ip }}:10443,
+            3 => '{{ minio_access_ip }}:10443',
           ),
           'objectstore' =>
            array (

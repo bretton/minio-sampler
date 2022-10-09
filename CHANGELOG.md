@@ -1,3 +1,9 @@
+0.30
+
+* Additional hotfixes
+
+---
+
 0.29
 
 * Bug fixes, prepare db and nextcloud not copied over
