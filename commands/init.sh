@@ -1443,7 +1443,7 @@ cat >site.yml<<"EOF"
     become: yes
     become_user: root
     copy:
-      dest: {{ nomad_job_src }}
+      dest: "{{ nomad_job_src }}"
       content: |
         job "nextcloud" {
           constraint {
@@ -1510,7 +1510,7 @@ cat >site.yml<<"EOF"
     become: yes
     become_user: root
     copy:
-      dest: {{ nextcloud_copy_src }}
+      dest: "{{ nextcloud_copy_src }}"
       content: |
         <?php
         $CONFIG = array (
@@ -1730,7 +1730,7 @@ cat >site.yml<<"EOF"
     become: yes
     become_user: root
     copy:
-      dest: "/root/preparedatabase.sh"
+      dest: /root/preparedatabase.sh
       content: |
         #!/bin/sh
         idmariadb=$(jls | grep {{ mariadb_clone_name }} | cut -c 1-8 |sed 's/[[:blank:]]*$//')
@@ -1751,7 +1751,7 @@ cat >site.yml<<"EOF"
     become: yes
     become_user: root
     copy:
-      dest: "/root/preparenextcloud.sh"
+      dest: /root/preparenextcloud.sh
       content: |
         #!/bin/sh
         idnextcloud=$(jls | grep nextcloud | cut -c 1-8 |sed 's/[[:blank:]]*$//')
