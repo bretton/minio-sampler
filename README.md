@@ -99,7 +99,7 @@ The default dashboard with links to all the included tools is `http://ACCESSIP`.
 
 Where `https` is applicable, please accept the self-signed certificate. You might need to do this twice, even refresh, to get the minio dashboard.
 
-### Minio Dashboard
+### Minio
 
 The Minio web interface is available via nginx reverse proxy at `https://ACCESSIP:19000` for the IP address set in ACCESSIP variable of `config.ini`.
 
@@ -109,9 +109,36 @@ Login with user `sampler` and `samplerpasswordislong` to access the dashboard.
 
 You can now create a bucket and explore settings.
 
-### Grafana Dashboard
+### Grafana
 
-The Grafana web interface is available via nginx reverse proxy at `http://ACCESSIP:3000` for the IP address set in ACCESSIP variable of `config.ini`.
+The Grafana web interface is available via nginx reverse proxy at `http://ACCESSIP:13000`. 
 
+Login with username `admin` and password `sampler`.
 
+### Prometheus
 
+The Prometheus web interface is available via nginx reverse proxy at `http://ACCESSIP:19090` and no credentials.
+
+### Alertmanager
+
+The Alertmanager web interface is available via nginx reverse proxy at `http://ACCESSIP:19093` and no credentials.
+
+### Consul
+
+The Consul web interface is available nginx reverse proxy at `http://ACCESSIP:18500` and no credentials.
+
+### Nomad
+
+The Nomad web interface is available nginx reverse proxy at `http://ACCESSIP:14646` and no credentials.
+
+### Traefik
+
+The Traefik web interface is available nginx reverse proxy at `http://ACCESSIP:19002` and no credentials.
+
+## Applications
+
+### Nextcloud
+
+There is a Nextcloud instance available at `https://ACCESSIP:104343`.
+
+The admin username is `sampler` and password `sampler123`.
