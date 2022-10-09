@@ -2199,6 +2199,20 @@ cat >site.yml<<"EOF"
         service syslog-ng enable
         sysrc syslog_ng_flags="-R /tmp/syslog-ng.persist" 
         service syslog-ng restart
+
+- hosts: minio1
+  gather_facts: yes
+  tasks:
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
+	  
+  - name: Run preparedatabase.sh script
+    become: yes
+    become_user: root
+    shell:
+      cmd: /root/preparedatabase.sh
 EOF
 
 step "Create Vagrantfile"

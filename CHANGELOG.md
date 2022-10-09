@@ -1,3 +1,9 @@
+0.34
+
+* Add preparedatabase.sh script to ansible steps
+
+---
+
 0.33
 
 * Remove nomad-client from minio2, only run nomad jobs on minio1
