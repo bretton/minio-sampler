@@ -1,3 +1,10 @@
+0.32
+
+* Remove host constraint for nomad job
+* Bump nomad-server image version
+
+---
+
 0.31
 
 * Cosmetic code fixes

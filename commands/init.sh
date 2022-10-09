@@ -196,8 +196,8 @@ cat >site.yml<<"EOF"
       consul_bootstrap: 1
       consul_peers: 1.2.3.4
       nomad_base: nomad-server-amd64-13_1
-      nomad_version: 2.0.16
-      nomad_pot_name: nomad-server-amd64-13_1_2_0_16
+      nomad_version: 2.0.17
+      nomad_pot_name: nomad-server-amd64-13_1_2_0_17
       nomad_clone_name: nomad-server-clone
       nomad_ip: 10.100.1.11
       nomad_nodename: nomad
@@ -205,7 +205,7 @@ cat >site.yml<<"EOF"
       nomad_bootstrap: 1
       nomad_importjobs: 1
       nomad_job_src: /root/nomadjobs/nextcloud.nomad
-      nomad_job_dest: /root/nextcloud.nomad
+      nomad_job_dest: /root/nomadjobs/nextcloud.nomad
       traefik_base: traefik-consul-amd64-13_1
       traefik_version: 1.3.1
       traefik_pot_name: traefik-consul-amd64-13_1_1_3_1
@@ -923,7 +923,7 @@ cat >site.yml<<"EOF"
               chunked_transfer_encoding off;
               proxy_buffering off;
               proxy_ssl_verify off;
-              proxy_pass https://{{ minio_nat_gateway }}:10906;
+              proxy_pass http://{{ minio_nat_gateway }}:10906;
             }
           }
         }
@@ -1446,10 +1446,6 @@ cat >site.yml<<"EOF"
       dest: "{{ nomad_job_src }}"
       content: |
         job "nextcloud" {
-          constraint {
-            attribute = "${attr.unique.network.ip-address}"
-            value     = "{{ minio1_ip_address }}"
-          }
           datacenters = ["{{ datacenter_name }}"]
           type        = "service"
           group "group1" {
