@@ -1,3 +1,9 @@
+0.38
+
+* Bump nextcloud image version
+
+---
+
 0.37
 
 * Fix preparedatabase.sh script
