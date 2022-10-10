@@ -314,12 +314,19 @@ cat >site.yml<<"EOF"
         {{ minio2_ip_address }} {{ minio2_hostname }}
         EOH
 
+  # - name: Add dns to resolv.conf
+  #   become: yes
+  #   become_user: root
+  #   shell:
+  #     cmd: |
+  #       echo nameserver {{ minio_nameserver }} >> /etc/resolv.conf
+
   - name: Add dns to resolv.conf
     become: yes
     become_user: root
     shell:
       cmd: |
-        echo nameserver {{ minio_nameserver }} >> /etc/resolv.conf
+        echo "nameserver {{ minio_nameserver }}" > /etc/resolv.conf
 
   - name: Create pkg config directory
     become: yes

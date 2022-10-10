@@ -1,3 +1,9 @@
+0.40
+
+* Overwrite /etc/resolv.conf with nameserver (testing) instead of append which introduces blank line
+
+---
+
 0.39
 
 * Minor adjustments to reverse proxy
