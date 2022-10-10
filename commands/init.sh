@@ -773,7 +773,7 @@ cat >site.yml<<"EOF"
             location / {
                try_files $uri $uri/ /index.html;
             }
-          } 
+          }
           server {
             listen 19000 ssl;
             ssl_certificate {{ local_openssl_dir }}/{{ local_openssl_nginx_cert }};
