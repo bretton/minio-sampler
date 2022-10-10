@@ -1,3 +1,10 @@
+0.36
+
+* Remove trailing whitespace
+* Remove tab characters
+
+---
+
 0.35
 
 * Update README

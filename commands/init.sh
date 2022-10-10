@@ -131,7 +131,7 @@ ssh-keygen -b 2048 -t rsa -f miniokey -q -N ""
 step "Make _build directory as a temporary fix for error which crops up"
 mkdir -p _build/
 
-# fix for SSH timeouts 
+# fix for SSH timeouts
 export SSH_AUTH_SOCK=""
 
 # add remote IP to file for ansible read
@@ -238,7 +238,7 @@ cat >site.yml<<"EOF"
       beast_smtp_from: "sampler@minio-sampler.com"
       beast_alertaddress: "your@example.com"
       beast_syslog_version: 3.37
-      beast_empty_var: 
+      beast_empty_var: ""
       mariadb_base: mariadb-amd64-13_1
       mariadb_version: 2.0.7
       mariadb_pot_name: mariadb-amd64-13_1_2_0_7
@@ -762,7 +762,7 @@ cat >site.yml<<"EOF"
           sendfile on;
           keepalive_timeout 65;
           gzip off;
-          server {                              
+          server {
             listen 80;
             server_name {{ minio1_hostname }};
             ignore_invalid_headers off;
@@ -927,7 +927,7 @@ cat >site.yml<<"EOF"
             }
           }
         }
-  
+
   - name: Create directory /usr/local/www/sampler
     ansible.builtin.file:
       path: /usr/local/www/sampler
@@ -1344,7 +1344,7 @@ cat >site.yml<<"EOF"
       mode: '0700'
       owner: root
       group: wheel
-  
+
   - name: setup nomad client log file
     become: yes
     become_user: root
@@ -1403,7 +1403,7 @@ cat >site.yml<<"EOF"
         pot clone \
           -P {{ consul_pot_name }} \
           -p {{ consul_clone_name }} \
-          -N alias -i "vtnet1|{{ consul_ip }}" 
+          -N alias -i "vtnet1|{{ consul_ip }}"
         pot set-env -p {{ consul_clone_name }} \
           -E DATACENTER={{ datacenter_name }} \
           -E NODENAME={{ consul_nodename }} \
@@ -1449,7 +1449,7 @@ cat >site.yml<<"EOF"
           datacenters = ["{{ datacenter_name }}"]
           type        = "service"
           group "group1" {
-            count = 1 
+            count = 1
             network {
               port "http" {
                 static = 10443
@@ -1457,9 +1457,9 @@ cat >site.yml<<"EOF"
             }
             task "nextcloud1" {
               driver = "pot"
-              restart {      
+              restart {
                 attempts = 3      
-                delay    = "30s"    
+                delay = "30s"
               }
               service {
                 tags = ["nginx", "www", "nextcloud"]
@@ -1513,7 +1513,7 @@ cat >site.yml<<"EOF"
           'instanceid' => '',
           'passwordsalt' => '',
           'secret' => '',
-          'trusted_domains' => 
+          'trusted_domains' =>
           array (
             0 => 'nextcloud.{{ minio1_hostname }}',
             1 => '{{ minio1_ip_address }}:10443',
@@ -1562,10 +1562,10 @@ cat >site.yml<<"EOF"
           'maintenance' => false,
           'theme' => '',
           'twofactor_enforced' => 'false',
-          'twofactor_enforced_groups' => 
+          'twofactor_enforced_groups' =>
           array (
           ),
-          'twofactor_enforced_excluded_groups' => 
+          'twofactor_enforced_excluded_groups' =>
           array (
             0 => 'no_2fa',
           ),
@@ -1580,7 +1580,7 @@ cat >site.yml<<"EOF"
           'mail_smtppassword' => '',
           'mail_smtpsecure' => 'ssl',
           'app.mail.verify-tls-peer' => false,
-          'app_install_overwrite' => 
+          'app_install_overwrite' =>
           array (
             0 => 'camerarawpreviews',
             1 => 'keeweb',
@@ -1942,7 +1942,7 @@ cat >site.yml<<"EOF"
         service syslogd onestop
         service syslogd disable
         service syslog-ng enable
-        sysrc syslog_ng_flags="-R /tmp/syslog-ng.persist" 
+        sysrc syslog_ng_flags="-R /tmp/syslog-ng.persist"
         service syslog-ng restart
 
   - name: Wait for port 22 to become open, wait for 2 seconds
@@ -2073,7 +2073,7 @@ cat >site.yml<<"EOF"
         sysrc node_exporter_user=nodeexport
         sysrc node_exporter_group=nodeexport
         service node_exporter restart
- 
+
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:
       port: 22
@@ -2197,7 +2197,7 @@ cat >site.yml<<"EOF"
         service syslogd onestop
         service syslogd disable
         service syslog-ng enable
-        sysrc syslog_ng_flags="-R /tmp/syslog-ng.persist" 
+        sysrc syslog_ng_flags="-R /tmp/syslog-ng.persist"
         service syslog-ng restart
 
 - hosts: minio1
@@ -2207,7 +2207,7 @@ cat >site.yml<<"EOF"
     wait_for:
       port: 22
       delay: 2
-	  
+
   - name: Run preparedatabase.sh script
     become: yes
     become_user: root
@@ -2359,7 +2359,7 @@ Vagrant.configure("2") do |config|
     ansible.verbose = ''
     ansible.config_file = 'ansible.cfg'
     ansible.raw_ssh_args = "-o ControlMaster=no -o IdentitiesOnly=yes -o ConnectionAttempts=20 -o ConnectTimeout=60 -o ServerAliveInterval=20"
-    ansible.raw_arguments = [	"--timeout=1000" ]
+    ansible.raw_arguments = [ "--timeout=1000" ]
     ansible.groups = {
       "all" => [ "minio1", "minio2" ],
         "all:vars" => {
