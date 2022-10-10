@@ -905,7 +905,7 @@ cat >site.yml<<"EOF"
             }
           }
           server {
-            listen 10443 ssl;
+            listen 443 ssl;
             ssl_certificate {{ local_openssl_dir }}/{{ local_openssl_nginx_cert }};
             ssl_certificate_key {{ local_openssl_dir }}/{{ local_openssl_private_key }};
             server_name {{ minio1_hostname }};
@@ -923,7 +923,7 @@ cat >site.yml<<"EOF"
               chunked_transfer_encoding off;
               proxy_buffering off;
               proxy_ssl_verify off;
-              proxy_pass http://{{ minio_nat_gateway }}:10906;
+              proxy_pass https://{{ minio_nat_gateway }}:10906;
             }
           }
         }
@@ -963,7 +963,7 @@ cat >site.yml<<"EOF"
           <li><a href="http://{{ minio_access_ip }}:14646">Nomad</a></li>
           <li><a href="http://{{ minio_access_ip }}:18500">Consul</a></li>
           <li><a href="http://{{ minio_access_ip }}:19002">Traefik</a></li>
-          <li><a href="https://{{ minio_access_ip }}:10443">Nextcloud</a></li>
+          <li><a href="https://{{ minio_access_ip }}">Nextcloud</a></li>
         </ul>
         </body>
         </html>

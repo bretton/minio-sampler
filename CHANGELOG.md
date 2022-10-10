@@ -1,3 +1,10 @@
+0.39
+
+* Minor adjustments to reverse proxy
+* Jails not getting DNS resolution for some reason
+
+---
+
 0.38
 
 * Bump nextcloud image version
