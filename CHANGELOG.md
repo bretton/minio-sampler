@@ -1,3 +1,10 @@
+0.37
+
+* Fix preparedatabase.sh script
+* Update nextcloud version
+
+---
+
 0.36
 
 * Remove trailing whitespace
