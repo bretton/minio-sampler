@@ -1,3 +1,10 @@
+0.41
+
+* Experimenting with pf.conf setup, adding only at the end to ensure setup works
+* Adjust /etc/resolv.conf again
+
+---
+
 0.40
 
 * Overwrite /etc/resolv.conf with nameserver (testing) instead of append which introduces blank line

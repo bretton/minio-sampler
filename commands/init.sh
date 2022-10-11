@@ -314,19 +314,14 @@ cat >site.yml<<"EOF"
         {{ minio2_ip_address }} {{ minio2_hostname }}
         EOH
 
-  # - name: Add dns to resolv.conf
-  #   become: yes
-  #   become_user: root
-  #   shell:
-  #     cmd: |
-  #       echo nameserver {{ minio_nameserver }} >> /etc/resolv.conf
-
   - name: Add dns to resolv.conf
     become: yes
     become_user: root
-    shell:
-      cmd: |
-        echo "nameserver {{ minio_nameserver }}" > /etc/resolv.conf
+    copy:
+      dest: /etc/resolv.conf
+      content: |
+        nameserver 10.0.2.3
+        nameserver {{ minio_nameserver }}
 
   - name: Create pkg config directory
     become: yes
@@ -607,7 +602,7 @@ cat >site.yml<<"EOF"
       port: 22
       delay: 2
 
-  - name: Wait for ssh to become available minio2
+  - name: Wait for ssh to become available on minio2
     become: yes
     become_user: root
     wait_for:
@@ -2220,6 +2215,59 @@ cat >site.yml<<"EOF"
     become_user: root
     shell:
       cmd: /root/preparedatabase.sh
+
+  - name: Create minio1 pf.conf
+    become: yes
+    become_user: root
+    copy:
+      dest: /etc/pf.conf
+      content: |
+        ext_if="vtnet1"
+        set block-policy drop
+        set skip on lo0
+        scrub in all
+        #nat-anchor pot-nat
+        #rdr-anchor "pot-rdr/*"
+        nat on $ext_if from 10.100.1/24 -> $ext_if:0
+        block
+        antispoof for $ext_if inet
+        pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
+        pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
+        # allow DHCP in and out
+        pass in on $ext_if inet proto udp from port = 68 to port = 67
+        pass out on $ext_if inet proto udp from port = 67 to port = 68
+        # allow ntp
+        pass in on $ext_if inet proto udp from any to any port 123
+        # ssh access
+        pass in quick on $ext_if proto tcp from any to port 22
+        # prevent pf start/reload from killing ansible ssh session
+        pass out on $ext_if proto tcp from port 22 to any flags any
+        pass from 10.100.1/24 to any
+        block drop in on $ext_if inet from 10.100.1/16 to any
+        # all outbound traffic on ext_if is ok
+        pass out on $ext_if
+
+  - name: Enable pf on minio1
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: pf
+      enabled: yes
+
+  - name: Enable pflog on minio1
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: pflog
+      enabled: yes
+
+  - name: Start pf on minio1
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: pf
+      state: started
+
 EOF
 
 step "Create Vagrantfile"
