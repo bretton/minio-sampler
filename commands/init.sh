@@ -2261,12 +2261,12 @@ cat >site.yml<<"EOF"
       name: pflog
       enabled: yes
 
-  - name: Start pf on minio1
-    become: yes
-    become_user: root
-    ansible.builtin.service:
-      name: pf
-      state: started
+  # - name: Start pf on minio1
+  #   become: yes
+  #   become_user: root
+  #   ansible.builtin.service:
+  #     name: pf
+  #     state: started
 
 EOF
 

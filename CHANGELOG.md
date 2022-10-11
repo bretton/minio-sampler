@@ -1,3 +1,9 @@
+0.42
+
+* Disable starting pf for testing purposes, as hanging everything
+
+---
+
 0.41
 
 * Experimenting with pf.conf setup, adding only at the end to ensure setup works
