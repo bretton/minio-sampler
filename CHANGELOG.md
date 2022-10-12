@@ -1,3 +1,9 @@
+0.44
+
+* Add natdnshostresolver1 value to Vagrantfile to fix jail DNS resolution issues
+
+---
+
 0.43
 
 * Remove pf.conf from ansible setup for now

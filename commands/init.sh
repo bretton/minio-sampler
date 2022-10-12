@@ -2311,6 +2311,7 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--nicpromisc1", "allow-all"]
       vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
       vb.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
+      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
       vb.customize ["setextradata", :id,
         "VBoxInternal/Devices/ahci/0/LUN#[0]/Config/IgnoreFlush", "0"]
       vb.default_nic_type = "virtio"
@@ -2381,6 +2382,7 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
       vb.customize ["modifyvm", :id, "--nicpromisc1", "allow-all"]
       vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+      vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
       vb.customize ["setextradata", :id,
         "VBoxInternal/Devices/ahci/0/LUN#[0]/Config/IgnoreFlush", "0"]
       vb.default_nic_type = "virtio"
