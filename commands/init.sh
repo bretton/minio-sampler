@@ -275,6 +275,11 @@ cat >site.yml<<"EOF"
       port: 22
       delay: 2
 
+  - name: Tolerate missing tcp timestamp
+    sysctl:
+      name: net.inet.tcp.tolerate_missing_ts
+      value: '1'
+
   - name: Disable coredumps
     sysctl:
       name: kern.coredump
@@ -320,8 +325,9 @@ cat >site.yml<<"EOF"
     copy:
       dest: /etc/resolv.conf
       content: |
-        nameserver 10.0.2.3
         nameserver {{ minio_nameserver }}
+        nameserver 10.0.2.3
+
 
   - name: Create pkg config directory
     become: yes
@@ -2216,50 +2222,50 @@ cat >site.yml<<"EOF"
     shell:
       cmd: /root/preparedatabase.sh
 
-  - name: Create minio1 pf.conf
-    become: yes
-    become_user: root
-    copy:
-      dest: /etc/pf.conf
-      content: |
-        ext_if="vtnet1"
-        set block-policy drop
-        set skip on lo0
-        scrub in all
-        #nat-anchor pot-nat
-        #rdr-anchor "pot-rdr/*"
-        nat on $ext_if from 10.100.1/24 -> $ext_if:0
-        block
-        antispoof for $ext_if inet
-        pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
-        pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
-        # allow DHCP in and out
-        pass in on $ext_if inet proto udp from port = 68 to port = 67
-        pass out on $ext_if inet proto udp from port = 67 to port = 68
-        # allow ntp
-        pass in on $ext_if inet proto udp from any to any port 123
-        # ssh access
-        pass in quick on $ext_if proto tcp from any to port 22
-        # prevent pf start/reload from killing ansible ssh session
-        pass out on $ext_if proto tcp from port 22 to any flags any
-        pass from 10.100.1/24 to any
-        block drop in on $ext_if inet from 10.100.1/16 to any
-        # all outbound traffic on ext_if is ok
-        pass out on $ext_if
+  # - name: Create minio1 pf.conf
+  #   become: yes
+  #   become_user: root
+  #   copy:
+  #     dest: /etc/pf.conf
+  #     content: |
+  #       ext_if="vtnet1"
+  #       set block-policy drop
+  #       set skip on lo0
+  #       scrub in all
+  #       #nat-anchor pot-nat
+  #       #rdr-anchor "pot-rdr/*"
+  #       nat on $ext_if from 10.100.1/24 -> $ext_if:0
+  #       block
+  #       antispoof for $ext_if inet
+  #       pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
+  #       pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
+  #       # allow DHCP in and out
+  #       pass in on $ext_if inet proto udp from port = 68 to port = 67
+  #       pass out on $ext_if inet proto udp from port = 67 to port = 68
+  #       # allow ntp
+  #       pass in on $ext_if inet proto udp from any to any port 123
+  #       # ssh access
+  #       pass in quick on $ext_if proto tcp from any to port 22
+  #       # prevent pf start/reload from killing ansible ssh session
+  #       pass out on $ext_if proto tcp from port 22 to any flags any
+  #       pass from 10.100.1/24 to any
+  #       block drop in on $ext_if inet from 10.100.1/16 to any
+  #       # all outbound traffic on ext_if is ok
+  #       pass out on $ext_if
 
-  - name: Enable pf on minio1
-    become: yes
-    become_user: root
-    ansible.builtin.service:
-      name: pf
-      enabled: yes
+  # - name: Enable pf on minio1
+  #   become: yes
+  #   become_user: root
+  #   ansible.builtin.service:
+  #     name: pf
+  #     enabled: yes
 
-  - name: Enable pflog on minio1
-    become: yes
-    become_user: root
-    ansible.builtin.service:
-      name: pflog
-      enabled: yes
+  # - name: Enable pflog on minio1
+  #   become: yes
+  #   become_user: root
+  #   ansible.builtin.service:
+  #     name: pflog
+  #     enabled: yes
 
   # - name: Start pf on minio1
   #   become: yes
@@ -2329,6 +2335,7 @@ Vagrant.configure("2") do |config|
       sysctl -w net.inet.tcp.msl=3000
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
       echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
+      echo "net.inet.tcp.tolerate_missing_ts=1" >> /etc/sysctl.conf
       echo 'interface "vtnet1" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
       service netif restart && service routing restart
       ping -c 1 google.com
@@ -2389,6 +2396,7 @@ Vagrant.configure("2") do |config|
       sysctl -w net.inet.tcp.msl=3000
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
       echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
+      echo "net.inet.tcp.tolerate_missing_ts=1" >> /etc/sysctl.conf
       echo 'interface "vtnet1" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
       service netif restart && service routing restart
       ping -c 1 google.com

@@ -1,3 +1,10 @@
+0.43
+
+* Remove pf.conf from ansible setup for now
+* Add sysctl values
+
+---
+
 0.42
 
 * Disable starting pf for testing purposes, as hanging everything
