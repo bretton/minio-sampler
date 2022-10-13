@@ -1,3 +1,9 @@
+0.47
+
+* Fixing typo in jailnet vlan IP
+
+---
+
 0.46
 
 * Switching to vlans for jail network

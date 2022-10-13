@@ -2355,7 +2355,7 @@ Vagrant.configure("2") do |config|
       ifconfig jailnet inet 10.200.1.1/24 up
       sysrc vlans_untrusted="jailnet"
       sysrc create_args_jailnet="vlan 1001"
-      sysrc ifconfig_jailnet="inet 10.200.1.3/24"
+      sysrc ifconfig_jailnet="inet 10.200.1.1/24"
       sysrc static_routes="jailstatic"
       sysrc route_jailstatic="-net 10.200.1.0/24 10.200.1.1"
       service netif restart && service routing restart
