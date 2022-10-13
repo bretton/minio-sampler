@@ -1461,6 +1461,10 @@ cat >site.yml<<"EOF"
             }
             task "nextcloud1" {
               driver = "pot"
+              restart {
+                attempts = 3      
+                delay = "300s"
+              }
               service {
                 tags = ["nginx", "www", "nextcloud"]
                 name = "nextcloud-server"
@@ -1470,6 +1474,11 @@ cat >site.yml<<"EOF"
                     name     = "tcp"
                     interval = "60s"
                     timeout  = "30s"
+                  }
+                  check_restart {
+                    limit = 0
+                    grace = "120s"
+                    ignore_warnings = false
                   }
               }
               config {
@@ -1490,8 +1499,8 @@ cat >site.yml<<"EOF"
                 }
               }
               resources {
-                cpu = 1000
-                memory = 2000
+                cpu = 500
+                memory = 1000
               }
             }
           }
@@ -2203,77 +2212,72 @@ cat >site.yml<<"EOF"
       port: 22
       delay: 2
 
+  # - name: Create minio1 pf.conf
+  #   become: yes
+  #   become_user: root
+  #   copy:
+  #     dest: /etc/pf.conf
+  #     content: |
+  #       #ext_if="untrusted"
+  #       #set skip on lo0  
+  #       #nat on $ext_if from 10.200.1/24 to !10.200/16 -> $ext_if:0
+  #       #pass from 10.200.1/24 to any  
+  #       #pass in on $ext_if from 10.200/16
+  #       #pass from 10.200/16 to 10.200/16
+  #       #pass
+  #       ####
+  #       ext_if="untrusted"
+  #       set block-policy drop
+  #       set skip on lo0
+  #       scrub in all
+  #       block
+  #       antispoof for $ext_if inet
+  #       antispoof for jailnet inet
+  #       pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
+  #       pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
+  #       pass in on $ext_if inet proto udp from port = 68 to port = 67
+  #       pass out on $ext_if inet proto udp from port = 67 to port = 68
+  #       pass in quick on $ext_if proto tcp from any to port 22
+  #       pass out on $ext_if proto tcp from port 22 to any flags any
+  #       anchor "reflect"
+  #       pass on jailnet
+  #       pass from 10.192/10 to !10/8
+  #       pass from 10.192/10 to 10.200/16
+  #       pass from 10.192/10 to 10.200.1/24
+  #       pass from 10.200.1/24 to 10.192/10
+  #       pass out on $ext_if
+  
+  # - name: Enable pf on minio1
+  #   become: yes
+  #   become_user: root
+  #   ansible.builtin.service:
+  #     name: pf
+  #     enabled: yes
+
+  # - name: Enable pflog on minio1
+  #   become: yes
+  #   become_user: root
+  #   ansible.builtin.service:
+  #     name: pflog
+  #     enabled: yes
+
+  # - name: Start pf on minio1
+  #   become: yes
+  #   become_user: root
+  #   ansible.builtin.service:
+  #     name: pf
+  #     state: started
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
+
   - name: Run preparedatabase.sh script
     become: yes
     become_user: root
     shell:
       cmd: /root/preparedatabase.sh
-
-  - name: Wait for port 22 to become open, wait for 2 seconds
-    wait_for:
-      port: 22
-      delay: 2
-
-  - name: Create minio1 pf.conf
-    become: yes
-    become_user: root
-    copy:
-      dest: /etc/pf.conf
-      content: |
-        #ext_if="untrusted"
-        #set skip on lo0  
-        #nat on $ext_if from 10.200.1/24 to !10.200/16 -> $ext_if:0
-        #pass from 10.200.1/24 to any  
-        #pass in on $ext_if from 10.200/16
-        #pass from 10.200/16 to 10.200/16
-        #pass
-        ####
-        ext_if="untrusted"
-        set block-policy drop
-        set skip on lo0
-        scrub in all
-        block
-        antispoof for $ext_if inet
-        antispoof for jailnet inet
-        pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
-        pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
-        pass in on $ext_if inet proto udp from port = 68 to port = 67
-        pass out on $ext_if inet proto udp from port = 67 to port = 68
-        pass in quick on $ext_if proto tcp from any to port 22
-        pass out on $ext_if proto tcp from port 22 to any flags any
-        anchor "reflect"
-        pass on jailnet
-        pass from 10.192/10 to !10/8
-        pass from 10.192/10 to 10.200/16
-        pass from 10.192/10 to 10.200.1/24
-        pass from 10.200.1/24 to 10.192/10
-        pass out on $ext_if
-  
-  - name: Enable pf on minio1
-    become: yes
-    become_user: root
-    ansible.builtin.service:
-      name: pf
-      enabled: yes
-
-  - name: Enable pflog on minio1
-    become: yes
-    become_user: root
-    ansible.builtin.service:
-      name: pflog
-      enabled: yes
-
-  - name: Start pf on minio1
-    become: yes
-    become_user: root
-    ansible.builtin.service:
-      name: pf
-      state: started
-
-  - name: Wait for port 22 to become open, wait for 2 seconds
-    wait_for:
-      port: 22
-      delay: 2
 
   - name: Add minio hosts to prometheus monitoring from outside jail
     become: yes

@@ -1,3 +1,10 @@
+0.54
+
+* Disabling pf again
+* Adjust nomad job file
+
+---
+
 0.53
 
 * Bump nextcloud version
