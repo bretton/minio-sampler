@@ -2,13 +2,10 @@
 
 ## FreeBSD
 
-(todo: add steps from https://docs.freebsd.org/en/books/handbook/virtualization/#virtualization-host-virtualbox )
-
-### Hosts which underwent an upgrade from 13.0 to 13.1
+### Did you upgrade from 13.0 to 13.1?
 Please see the [ERRATA](ERRATA.md) file for info on fixing a broken upgrade.
 
 ### Install for FreeBSD
-
 Install packages, start services and configure permissions and networks
 ```
 pkg install bash git packer py39-ansible py39-packaging vagrant virtualbox-ose

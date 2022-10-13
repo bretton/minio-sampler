@@ -2209,6 +2209,11 @@ cat >site.yml<<"EOF"
     shell:
       cmd: /root/preparedatabase.sh
 
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
+
   - name: Create minio1 pf.conf
     become: yes
     become_user: root
@@ -2264,6 +2269,62 @@ cat >site.yml<<"EOF"
     ansible.builtin.service:
       name: pf
       state: started
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
+
+  - name: Add minio hosts to prometheus monitoring from outside jail
+    become: yes
+    become_user: root
+    copy:
+      dest: /mnt/data/jaildata/beast/prometheus/targets.d/minio.yml
+      content: |
+        - targets:
+          - {{ minio1_ip_address }}:9000
+          - {{ minio2_ip_address }}:9000
+          labels:
+            job: minio
+
+  - name: Add mysql host to prometheus monitoring from outside jail
+    become: yes
+    become_user: root
+    copy:
+      dest: /mnt/data/jaildata/beast/prometheus/targets.d/minio.yml
+      content: |
+        - targets:
+          - {{ mariadb_ip }}:9104
+          labels:
+            job: mysql
+
+  - name: Add script to reload prometheus inside jail to minio1
+    become: yes
+    become_user: root
+    copy:
+      dest: /root/reloadprometheus.sh
+      content: |
+        #!/bin/sh
+        idbeast=$(jls | grep {{ beast_clone_name }} | cut -c 1-8 | sed 's/[[:blank:]]*$//')
+        jexec -U root "$idbeast" service prometheus restart
+
+  - name: Set prometheus reload script permissions on minio1
+    ansible.builtin.file:
+      path: "/root/reloadprometheus.sh"
+      mode: '0755'
+      owner: root
+      group: wheel
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
+
+  - name: reload prometheus inside the beast jail on minio1
+    become: yes
+    become_user: root
+    shell:
+      cmd: /root/reloadprometheus.sh
 
 EOF
 

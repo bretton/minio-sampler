@@ -139,6 +139,6 @@ The Traefik web interface is available nginx reverse proxy at `http://ACCESSIP:1
 
 ### Nextcloud
 
-There is a Nextcloud instance available at `https://ACCESSIP:104343`.
+There is a Nextcloud instance available at `https://ACCESSIP:10443`.
 
 The admin username is `sampler` and password `sampler123`.

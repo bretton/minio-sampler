@@ -1,3 +1,9 @@
+0.51
+
+* Add minio hosts and mariadb to beast prometheus monitoring
+
+---
+
 0.50
 
 * Added NETWORK-DESIGN.md
