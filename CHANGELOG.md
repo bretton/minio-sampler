@@ -1,3 +1,9 @@
+0.49
+
+* Remove restarts from nextcloud nomad job, needs to install software and nomad keep restarts
+
+---
+
 0.48
 
 * Updating interface name to clone for pot jails to use vlan interface jailnet

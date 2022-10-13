@@ -9,7 +9,7 @@ usage()
 {
   echo "Usage: minsampler init [-hv] [-n network] [-r freebsd_version] sampler_name
 
-    network defaults to '10.100.1'
+    network defaults to '10.100.1' - do not change as things break
     freebd_version defaults to '13.1'
 "
 }
@@ -40,15 +40,11 @@ if [ "${totaldisksize}" -ge "${availablespace}" ]; then
     exit 1; exit 1
 fi
 
+# Current FreeBSD version
 FREEBSD_VERSION=13.1
+
 # Do not change this if using Virtualbox DHCP on primary interface
 GATEWAY="10.0.2.2"
-
-# ToDo: get IP, ping a range to find free IP, set ACCESSIP in ../config.ini to a free IP address.
-# getmyip()
-# {
-#     /usr/bin/env perl -MSocket -le 'socket(S, PF_INET, SOCK_DGRAM, getprotobyname(\"udp\")); connect(S, sockaddr_in(1, inet_aton(\"1.1.1.1\"))); print inet_ntoa((sockaddr_in(getsockname(S)))[1]);'
-# }
 
 # enable experimental disk support
 export VAGRANT_EXPERIMENTAL="disks"
@@ -230,7 +226,7 @@ cat >site.yml<<"EOF"
       beast_scrape_consul: "10.200.1.2:8500"
       beast_scrape_nomad: "10.200.1.3:4646"
       beast_scrape_db: "10.200.1.15"
-      beast_scrape_traefik: "10.200.1.3:8082"
+      beast_scrape_traefik: "10.200.1.4:8082"
       beast_influxsource: "10.200.1.100"
       beast_influxname: database
       beast_smtphostport: "localhost:25"
@@ -1465,10 +1461,6 @@ cat >site.yml<<"EOF"
             }
             task "nextcloud1" {
               driver = "pot"
-              restart {
-                attempts = 3      
-                delay = "30s"
-              }
               service {
                 tags = ["nginx", "www", "nextcloud"]
                 name = "nextcloud-server"
@@ -1478,11 +1470,6 @@ cat >site.yml<<"EOF"
                     name     = "tcp"
                     interval = "60s"
                     timeout  = "30s"
-                  }
-                  check_restart {
-                    limit = 0
-                    grace = "120s"
-                    ignore_warnings = false
                   }
               }
               config {
