@@ -1,6 +1,13 @@
+0.50
+
+* Added NETWORK-DESIGN.md
+
+---
+
 0.49
 
 * Remove restarts from nextcloud nomad job, needs to install software and nomad keep restarts
+* Fix bugs with wrong traefik IP to monitor
 
 ---
 
