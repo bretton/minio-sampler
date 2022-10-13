@@ -1,3 +1,9 @@
+0.48
+
+* Updating interface name to clone for pot jails to use vlan interface jailnet
+
+---
+
 0.47
 
 * Fixing typo in jailnet vlan IP

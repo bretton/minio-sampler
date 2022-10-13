@@ -186,6 +186,7 @@ cat >site.yml<<"EOF"
       local_openssl_nginx_cert: bundle.pem
       datacenter_name: samplerdc
       gossip_key: "BBtPyNSRI+/iP8RHB514CZ5By3x1jJLu4SqTVzM4gPA="
+      jails_interface: jailnet
       consul_base: consul-amd64-13_1
       consul_version: 2.0.23
       consul_pot_name: consul-amd64-13_1_2_0_23
@@ -1178,7 +1179,7 @@ cat >site.yml<<"EOF"
         POT_NETWORK=10.192.0.0/10
         POT_NETMASK=255.192.0.0
         POT_GATEWAY=10.192.0.1
-        POT_EXTIF=vtnet1
+        POT_EXTIF=untrusted
 
   - name: Initiate pot
     become: yes
@@ -1410,7 +1411,7 @@ cat >site.yml<<"EOF"
         pot clone \
           -P {{ consul_pot_name }} \
           -p {{ consul_clone_name }} \
-          -N alias -i "vtnet1|{{ consul_ip }}"
+          -N alias -i "{{ jails_interface }}|{{ consul_ip }}"
         pot set-env -p {{ consul_clone_name }} \
           -E DATACENTER={{ datacenter_name }} \
           -E NODENAME={{ consul_nodename }} \
@@ -1614,7 +1615,7 @@ cat >site.yml<<"EOF"
       cmd: |
         pot clone -P {{ nomad_pot_name }} \
           -p {{ nomad_clone_name }} \
-          -N alias -i "vtnet1|{{ nomad_ip }}"
+          -N alias -i "{{ jails_interface }}|{{ nomad_ip }}"
         pot copy-in -p {{ nomad_clone_name }} \
           -s {{ nomad_job_src }} \
           -d {{ nomad_job_dest }}
@@ -1669,7 +1670,7 @@ cat >site.yml<<"EOF"
       cmd: |
         pot clone -P {{ traefik_pot_name }} \
           -p {{ traefik_clone_name }} \
-          -N alias -i "vtnet1|{{ traefik_ip }}"
+          -N alias -i "{{ jails_interface }}|{{ traefik_ip }}"
         pot set-env -p {{ traefik_clone_name }} \
           -E NODENAME={{ traefik_nodename }} \
           -E DATACENTER={{ datacenter_name }} \
@@ -1705,7 +1706,7 @@ cat >site.yml<<"EOF"
       cmd: |
         pot clone -P {{ mariadb_pot_name }} \
           -p {{ mariadb_clone_name }} \
-          -N alias -i "vtnet1|{{ mariadb_ip }}"
+          -N alias -i "{{ jails_interface }}|{{ mariadb_ip }}"
         pot mount-in -p {{ mariadb_clone_name }} \
           -d {{ mariadb_mount_in }} \
           -m {{ mariadb_mount_dest }}
@@ -1797,7 +1798,7 @@ cat >site.yml<<"EOF"
       cmd: |
         pot clone -P {{ beast_pot_name }} \
           -p {{ beast_clone_name }} \
-          -N alias -i "vtnet1|{{ beast_ip }}"
+          -N alias -i "{{ jails_interface }}|{{ beast_ip }}"
         pot mount-in -p {{ beast_clone_name }} \
           -d {{ beast_mount_in }} \
           -m {{ beast_mount_dest }}
