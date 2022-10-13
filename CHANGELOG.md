@@ -1,3 +1,9 @@
+0.53
+
+* Bump nextcloud version
+
+---
+
 0.52
 
 * Fix typo for mysql in prometheus monitoring

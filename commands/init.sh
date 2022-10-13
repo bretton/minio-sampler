@@ -258,7 +258,7 @@ cat >site.yml<<"EOF"
       nextcloud_copy_src: /root/nomadjobs/nc-config.php.in
       nextcloud_copy_dest: /root/nc-config.php
       nextcloud_base: nextcloud-nginx-nomad-amd64-13_1
-      nextcloud_version: 0.39
+      nextcloud_version: 0.40
       nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
       nextcloud_www_src: /mnt/data/jaildata/nextcloud/nextcloud_www
       nextcloud_www_dest: /usr/local/www/nextcloud
