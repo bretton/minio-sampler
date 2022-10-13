@@ -1,3 +1,9 @@
+0.52
+
+* Fix typo for mysql in prometheus monitoring
+
+---
+
 0.51
 
 * Add minio hosts and mariadb to beast prometheus monitoring

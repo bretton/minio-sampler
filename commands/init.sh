@@ -2291,7 +2291,7 @@ cat >site.yml<<"EOF"
     become: yes
     become_user: root
     copy:
-      dest: /mnt/data/jaildata/beast/prometheus/targets.d/minio.yml
+      dest: /mnt/data/jaildata/beast/prometheus/targets.d/mysql.yml
       content: |
         - targets:
           - {{ mariadb_ip }}:9104
