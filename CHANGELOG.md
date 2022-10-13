@@ -1,3 +1,15 @@
+0.46
+
+* Switching to vlans for jail network
+
+---
+
+0.45
+
+* Updates to Vagrantfile, attempting static routes
+
+---
+
 0.44
 
 * Add natdnshostresolver1 value to Vagrantfile to fix jail DNS resolution issues

@@ -191,7 +191,7 @@ cat >site.yml<<"EOF"
       consul_pot_name: consul-amd64-13_1_2_0_23
       consul_clone_name: consul-clone
       consul_url: https://potluck.honeyguide.net/consul
-      consul_ip: 10.100.1.10
+      consul_ip: 10.200.1.2
       consul_nodename: consul
       consul_bootstrap: 1
       consul_peers: 1.2.3.4
@@ -199,7 +199,7 @@ cat >site.yml<<"EOF"
       nomad_version: 2.0.17
       nomad_pot_name: nomad-server-amd64-13_1_2_0_17
       nomad_clone_name: nomad-server-clone
-      nomad_ip: 10.100.1.11
+      nomad_ip: 10.200.1.3
       nomad_nodename: nomad
       nomad_url: https://potluck.honeyguide.net/nomad-server
       nomad_bootstrap: 1
@@ -211,7 +211,7 @@ cat >site.yml<<"EOF"
       traefik_pot_name: traefik-consul-amd64-13_1_1_3_1
       traefik_clone_name: traefik-consul-clone
       traefik_url: https://potluck.honeyguide.net/traefik-consul
-      traefik_ip: 10.100.1.12
+      traefik_ip: 10.200.1.4
       traefik_mount_in: /mnt/data/jaildata/traefik
       traefik_nodename: traefikconsul
       beast_base: beast-of-argh-amd64-13_1
@@ -220,17 +220,17 @@ cat >site.yml<<"EOF"
       beast_nodename: beast
       beast_url: https://potluck.honeyguide.net/beast-of-argh/
       beast_clone_name: beast-clone
-      beast_ip: 10.100.1.99
+      beast_ip: 10.200.1.99
       beast_mount_in: /mnt/data/jaildata/beast
       beast_mount_dest: /mnt
-      beast_join_consul: "10.100.1.10"
+      beast_join_consul: "10.200.1.2"
       beast_grafana_user: admin
       beast_grafana_pass: sampler
-      beast_scrape_consul: "10.100.1.10:8500"
-      beast_scrape_nomad: "10.100.1.11:4646"
-      beast_scrape_db: "10.100.1.15"
-      beast_scrape_traefik: "10.100.1.12:8082"
-      beast_influxsource: "10.100.1.80"
+      beast_scrape_consul: "10.200.1.2:8500"
+      beast_scrape_nomad: "10.200.1.3:4646"
+      beast_scrape_db: "10.200.1.15"
+      beast_scrape_traefik: "10.200.1.3:8082"
+      beast_influxsource: "10.200.1.100"
       beast_influxname: database
       beast_smtphostport: "localhost:25"
       beast_smtp_user: "your@example.com"
@@ -245,7 +245,7 @@ cat >site.yml<<"EOF"
       mariadb_url: https://potluck.honeyguide.net/mariadb
       mariadb_nodename: mariadb
       mariadb_clone_name: mariadb-clone
-      mariadb_ip: 10.100.1.15
+      mariadb_ip: 10.200.1.15
       mariadb_mount_in: /mnt/data/jaildata/mariadb/var_db_mysql
       mariadb_mount_dest: /var/db/mysql
       mariadb_dumpuser: root
@@ -266,7 +266,7 @@ cat >site.yml<<"EOF"
       nextcloud_www_src: /mnt/data/jaildata/nextcloud/nextcloud_www
       nextcloud_www_dest: /usr/local/www/nextcloud
       nextcloud_storage_src: /mnt/data/jaildata/nextcloud/storage
-      nextcloud_storage_dest:  /mnt/nextcloud
+      nextcloud_storage_dest: /mnt/nextcloud
       nextcloud_admin_user: sampler
       nextcloud_admin_pass: sampler123
 
@@ -326,8 +326,7 @@ cat >site.yml<<"EOF"
       dest: /etc/resolv.conf
       content: |
         nameserver {{ minio_nameserver }}
-        nameserver 10.0.2.3
-
+        #nameserver 10.0.2.3
 
   - name: Create pkg config directory
     become: yes
@@ -1740,8 +1739,8 @@ cat >site.yml<<"EOF"
         idmariadb=$(jls | grep {{ mariadb_clone_name }} | cut -c 1-8 | sed 's/[[:blank:]]*$//')
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "DROP DATABASE IF EXISTS {{ mariadb_nc_db_name }}"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE DATABASE {{ mariadb_nc_db_name }}"
-        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER '{{ mariadb_nc_user }}'@'10.100.1.%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
-        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on {{ mariadb_nc_db_name }}.* to '{{ mariadb_nc_user }}'@'10.100.1.%'"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER '{{ mariadb_nc_user }}'@'10.200.1.%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on {{ mariadb_nc_db_name }}.* to '{{ mariadb_nc_user }}'@'10.200.1.%'"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "FLUSH PRIVILEGES"
 
   - name: Set preparedatabase.sh permissions
@@ -2222,57 +2221,61 @@ cat >site.yml<<"EOF"
     shell:
       cmd: /root/preparedatabase.sh
 
-  # - name: Create minio1 pf.conf
-  #   become: yes
-  #   become_user: root
-  #   copy:
-  #     dest: /etc/pf.conf
-  #     content: |
-  #       ext_if="vtnet1"
-  #       set block-policy drop
-  #       set skip on lo0
-  #       scrub in all
-  #       #nat-anchor pot-nat
-  #       #rdr-anchor "pot-rdr/*"
-  #       nat on $ext_if from 10.100.1/24 -> $ext_if:0
-  #       block
-  #       antispoof for $ext_if inet
-  #       pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
-  #       pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
-  #       # allow DHCP in and out
-  #       pass in on $ext_if inet proto udp from port = 68 to port = 67
-  #       pass out on $ext_if inet proto udp from port = 67 to port = 68
-  #       # allow ntp
-  #       pass in on $ext_if inet proto udp from any to any port 123
-  #       # ssh access
-  #       pass in quick on $ext_if proto tcp from any to port 22
-  #       # prevent pf start/reload from killing ansible ssh session
-  #       pass out on $ext_if proto tcp from port 22 to any flags any
-  #       pass from 10.100.1/24 to any
-  #       block drop in on $ext_if inet from 10.100.1/16 to any
-  #       # all outbound traffic on ext_if is ok
-  #       pass out on $ext_if
+  - name: Create minio1 pf.conf
+    become: yes
+    become_user: root
+    copy:
+      dest: /etc/pf.conf
+      content: |
+        #ext_if="untrusted"
+        #set skip on lo0  
+        #nat on $ext_if from 10.200.1/24 to !10.200/16 -> $ext_if:0
+        #pass from 10.200.1/24 to any  
+        #pass in on $ext_if from 10.200/16
+        #pass from 10.200/16 to 10.200/16
+        #pass
+        ####
+        ext_if="untrusted"
+        set block-policy drop
+        set skip on lo0
+        scrub in all
+        block
+        antispoof for $ext_if inet
+        antispoof for jailnet inet
+        pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
+        pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
+        pass in on $ext_if inet proto udp from port = 68 to port = 67
+        pass out on $ext_if inet proto udp from port = 67 to port = 68
+        pass in quick on $ext_if proto tcp from any to port 22
+        pass out on $ext_if proto tcp from port 22 to any flags any
+        anchor "reflect"
+        pass on jailnet
+        pass from 10.192/10 to !10/8
+        pass from 10.192/10 to 10.200/16
+        pass from 10.192/10 to 10.200.1/24
+        pass from 10.200.1/24 to 10.192/10
+        pass out on $ext_if
+  
+  - name: Enable pf on minio1
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: pf
+      enabled: yes
 
-  # - name: Enable pf on minio1
-  #   become: yes
-  #   become_user: root
-  #   ansible.builtin.service:
-  #     name: pf
-  #     enabled: yes
+  - name: Enable pflog on minio1
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: pflog
+      enabled: yes
 
-  # - name: Enable pflog on minio1
-  #   become: yes
-  #   become_user: root
-  #   ansible.builtin.service:
-  #     name: pflog
-  #     enabled: yes
-
-  # - name: Start pf on minio1
-  #   become: yes
-  #   become_user: root
-  #   ansible.builtin.service:
-  #     name: pf
-  #     state: started
+  - name: Start pf on minio1
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: pf
+      state: started
 
 EOF
 
@@ -2331,14 +2334,32 @@ Vagrant.configure("2") do |config|
       sysrc ipv6_network_interfaces="none"
       sysrc defaultrouter="${GATEWAY}"
       sysrc gateway_enable="YES"
+      ifconfig vtnet0 name untrusted
+      ifconfig vtnet1 "${NETWORK}.3" netmask 255.255.255.0 up
+      ifconfig vtnet2 "${ACCESSIP}" netmask 255.255.255.0 up
+      sysrc ifconfig_vtnet0_name="untrusted"
+      sysrc ifconfig_untrusted="SYNCDHCP"
       sysrc ifconfig_vtnet1="inet ${NETWORK}.3 netmask 255.255.255.0"
       sysrc ifconfig_vtnet2="inet ${ACCESSIP} netmask 255.255.255.0"
+      sysctl security.jail.allow_raw_sockets=1
       sysctl -w net.inet.tcp.msl=3000
+      sysctl -w security.jail.allow_raw_sockets=1
+      sysctl -w net.inet.tcp.tolerate_missing_ts=1
+      echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
       echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
       echo "net.inet.tcp.tolerate_missing_ts=1" >> /etc/sysctl.conf
       echo 'interface "vtnet1" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
       service netif restart && service routing restart
+      ifconfig jailnet create vlan 1001 vlandev untrusted
+      ifconfig jailnet inet 10.200.1.1/24 up
+      sysrc vlans_untrusted="jailnet"
+      sysrc create_args_jailnet="vlan 1001"
+      sysrc ifconfig_jailnet="inet 10.200.1.3/24"
+      sysrc static_routes="jailstatic"
+      sysrc route_jailstatic="-net 10.200.1.0/24 10.200.1.1"
+      service netif restart && service routing restart
+      echo "checking DNS resolution with ping"
       ping -c 1 google.com
       mkdir -p /mnt/minio
       gpart create -s GPT ada1
@@ -2394,13 +2415,22 @@ Vagrant.configure("2") do |config|
       sysrc ipv6_network_interfaces="none"
       sysrc defaultrouter="${GATEWAY}"
       sysrc gateway_enable="YES"
+      ifconfig vtnet0 name untrusted
+      ifconfig vtnet1 "${NETWORK}.4" netmask 255.255.255.0 up
+      sysrc ifconfig_vtnet0_name="untrusted"
+      sysrc ifconfig_untrusted="SYNCDHCP"
       sysrc ifconfig_vtnet1="inet ${NETWORK}.4 netmask 255.255.255.0"
+      sysctl security.jail.allow_raw_sockets=1
       sysctl -w net.inet.tcp.msl=3000
+      sysctl -w security.jail.allow_raw_sockets=1
+      sysctl -w net.inet.tcp.tolerate_missing_ts=1
+      echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
       echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
       echo "net.inet.tcp.tolerate_missing_ts=1" >> /etc/sysctl.conf
       echo 'interface "vtnet1" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
       service netif restart && service routing restart
+      echo "checking DNS resolution with ping"
       ping -c 1 google.com
       mkdir -p /mnt/minio
       gpart create -s GPT ada1
