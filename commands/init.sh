@@ -258,7 +258,7 @@ cat >site.yml<<"EOF"
       nextcloud_copy_src: /root/nomadjobs/nc-config.php.in
       nextcloud_copy_dest: /root/nc-config.php
       nextcloud_base: nextcloud-nginx-nomad-amd64-13_1
-      nextcloud_version: "0.40"
+      nextcloud_version: "0.41"
       nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
       nextcloud_www_src: /mnt/data/jaildata/nextcloud/nextcloud_www
       nextcloud_www_dest: /usr/local/www/nextcloud
@@ -1477,7 +1477,7 @@ cat >site.yml<<"EOF"
               driver = "pot"
               restart {
                 attempts = 3      
-                delay = "300s"
+                delay = "30s"
               }
               service {
                 tags = ["nginx", "www", "nextcloud"]
@@ -1490,8 +1490,8 @@ cat >site.yml<<"EOF"
                     timeout  = "30s"
                   }
                   check_restart {
-                    limit = 0
-                    grace = "120s"
+                    limit = 3
+                    grace = "600s"
                     ignore_warnings = false
                   }
               }
@@ -2226,66 +2226,66 @@ cat >site.yml<<"EOF"
       port: 22
       delay: 2
 
-  # - name: Create minio1 pf.conf
-  #   become: yes
-  #   become_user: root
-  #   copy:
-  #     dest: /etc/pf.conf
-  #     content: |
-  #       #ext_if="untrusted"
-  #       #set skip on lo0  
-  #       #nat on $ext_if from 10.200.1/24 to !10.200/16 -> $ext_if:0
-  #       #pass from 10.200.1/24 to any  
-  #       #pass in on $ext_if from 10.200/16
-  #       #pass from 10.200/16 to 10.200/16
-  #       #pass
-  #       ####
-  #       ext_if="untrusted"
-  #       set block-policy drop
-  #       set skip on lo0
-  #       scrub in all
-  #       block
-  #       antispoof for $ext_if inet
-  #       antispoof for jailnet inet
-  #       pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
-  #       pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
-  #       pass in on $ext_if inet proto udp from port = 68 to port = 67
-  #       pass out on $ext_if inet proto udp from port = 67 to port = 68
-  #       pass in quick on $ext_if proto tcp from any to port 22
-  #       pass out on $ext_if proto tcp from port 22 to any flags any
-  #       anchor "reflect"
-  #       pass on jailnet
-  #       pass from 10.192/10 to !10/8
-  #       pass from 10.192/10 to 10.200/16
-  #       pass from 10.192/10 to 10.200.1/24
-  #       pass from 10.200.1/24 to 10.192/10
-  #       pass out on $ext_if
+  - name: Create minio1 pf.conf
+    become: yes
+    become_user: root
+    copy:
+      dest: /etc/pf.conf
+      content: |
+        ext_if="untrusted"
+        set skip on lo0  
+        nat on $ext_if from 10.200.1/24 to !10.200/16 -> $ext_if:0
+        pass from 10.200.1/24 to any  
+        pass in on $ext_if from 10.200/16
+        pass from 10.200/16 to 10.200/16
+        pass
+        ####
+        # ext_if="untrusted"
+        # set block-policy drop
+        # set skip on lo0
+        # scrub in all
+        # block
+        # antispoof for $ext_if inet
+        # antispoof for jailnet inet
+        # pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
+        # pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
+        # pass in on $ext_if inet proto udp from port = 68 to port = 67
+        # pass out on $ext_if inet proto udp from port = 67 to port = 68
+        # pass in quick on $ext_if proto tcp from any to port 22
+        # pass out on $ext_if proto tcp from port 22 to any flags any
+        # anchor "reflect"
+        # pass on jailnet
+        # pass from 10.192/10 to !10/8
+        # pass from 10.192/10 to 10.200/16
+        # pass from 10.192/10 to 10.200.1/24
+        # pass from 10.200.1/24 to 10.192/10
+        # pass out on $ext_if
   
-  # - name: Enable pf on minio1
-  #   become: yes
-  #   become_user: root
-  #   ansible.builtin.service:
-  #     name: pf
-  #     enabled: yes
+  - name: Enable pf on minio1
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: pf
+      enabled: yes
 
-  # - name: Enable pflog on minio1
-  #   become: yes
-  #   become_user: root
-  #   ansible.builtin.service:
-  #     name: pflog
-  #     enabled: yes
+  - name: Enable pflog on minio1
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: pflog
+      enabled: yes
 
-  # - name: Start pf on minio1
-  #   become: yes
-  #   become_user: root
-  #   ansible.builtin.service:
-  #     name: pf
-  #     state: started
+  - name: Start pf on minio1
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: pf
+      state: started
 
-  # - name: Wait for port 22 to become open, wait for 2 seconds
-  #   wait_for:
-  #     port: 22
-  #     delay: 2
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
 
   - name: Run preparedatabase.sh script
     become: yes
@@ -2496,14 +2496,6 @@ Vagrant.configure("2") do |config|
       echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
       echo "net.inet.tcp.tolerate_missing_ts=1" >> /etc/sysctl.conf
       echo 'interface "vtnet1" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
-      service netif restart && service routing restart
-      ifconfig jailnet create vlan 1001 vlandev untrusted
-      ifconfig jailnet inet 10.200.1.100/24 up
-      sysrc vlans_untrusted="jailnet"
-      sysrc create_args_jailnet="vlan 1001"
-      sysrc ifconfig_jailnet="inet 10.200.1.100/24"
-      sysrc static_routes="jailstatic"
-      sysrc route_jailstatic="-net 10.200.1.0/24 10.200.1.100"
       service netif restart && service routing restart
       echo "checking DNS resolution with ping"
       ping -c 1 google.com

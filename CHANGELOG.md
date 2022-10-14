@@ -1,3 +1,12 @@
+0.58
+
+* Remove vlan from minio2
+* Add simple pf.conf
+* Prometheus won't get stats from minio2 for this example due to network issues
+* Bump nextcloud image version
+
+---
+
 0.57
 
 * Add vlan interface to minio2
