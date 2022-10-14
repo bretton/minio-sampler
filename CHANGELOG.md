@@ -1,3 +1,9 @@
+0.57
+
+* Add vlan interface to minio2
+
+---
+
 0.56
 
 * Double-quote nextcloud version in vars due to error (testing)

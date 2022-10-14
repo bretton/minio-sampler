@@ -2497,6 +2497,14 @@ Vagrant.configure("2") do |config|
       echo "net.inet.tcp.tolerate_missing_ts=1" >> /etc/sysctl.conf
       echo 'interface "vtnet1" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
       service netif restart && service routing restart
+      ifconfig jailnet create vlan 1001 vlandev untrusted
+      ifconfig jailnet inet 10.200.1.100/24 up
+      sysrc vlans_untrusted="jailnet"
+      sysrc create_args_jailnet="vlan 1001"
+      sysrc ifconfig_jailnet="inet 10.200.1.100/24"
+      sysrc static_routes="jailstatic"
+      sysrc route_jailstatic="-net 10.200.1.0/24 10.200.1.100"
+      service netif restart && service routing restart
       echo "checking DNS resolution with ping"
       ping -c 1 google.com
       mkdir -p /mnt/minio
