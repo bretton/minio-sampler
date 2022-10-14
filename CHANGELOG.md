@@ -1,3 +1,10 @@
+0.55
+
+* Make sure minio stats are public for prometheus
+* Preload the nextcloud pot image
+
+---
+
 0.54
 
 * Disabling pf again

@@ -993,7 +993,8 @@ cat >site.yml<<"EOF"
       cmd: |
         service minio enable
         sysrc minio_certs="{{ local_openssl_dir }}"
-        sysrc minio_env="MINIO_ACCESS_KEY={{ minio_access_key }} MINIO_SECRET_KEY={{ minio_access_password }}"
+        sysrc minio_syslog_enable="YES"
+        sysrc minio_env="MINIO_ACCESS_KEY={{ minio_access_key }} MINIO_SECRET_KEY={{ minio_access_password }} MINIO_PROMETHEUS_AUTH_TYPE=public"
         sysrc minio_disks="{{ minio_erasure_coding_collection }}"
 
 - hosts: minio2
@@ -1088,7 +1089,8 @@ cat >site.yml<<"EOF"
       cmd: |
         service minio enable
         sysrc minio_certs="{{ local_openssl_dir }}"
-        sysrc minio_env="MINIO_ACCESS_KEY={{ minio_access_key }} MINIO_SECRET_KEY={{ minio_access_password }}"
+        sysrc minio_syslog_enable="YES"
+        sysrc minio_env="MINIO_ACCESS_KEY={{ minio_access_key }} MINIO_SECRET_KEY={{ minio_access_password }} MINIO_PROMETHEUS_AUTH_TYPE=public"
         sysrc minio_disks="{{ minio_erasure_coding_collection }}"
 
 - hosts: all
@@ -1381,6 +1383,18 @@ cat >site.yml<<"EOF"
     ansible.builtin.service:
       name: nomad
       state: started
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
+
+  - name: download the nextcloud pot image so it's already local
+    become: yes
+    become_user: root
+    shell:
+      cmd: |
+        pot import -p {{ nextcloud_base }} -t {{ nextcloud_version }} -U {{ nextcloud_url }}
 
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:
@@ -2268,10 +2282,10 @@ cat >site.yml<<"EOF"
   #     name: pf
   #     state: started
 
-  - name: Wait for port 22 to become open, wait for 2 seconds
-    wait_for:
-      port: 22
-      delay: 2
+  # - name: Wait for port 22 to become open, wait for 2 seconds
+  #   wait_for:
+  #     port: 22
+  #     delay: 2
 
   - name: Run preparedatabase.sh script
     become: yes
