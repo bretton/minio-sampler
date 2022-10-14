@@ -1,3 +1,9 @@
+0.56
+
+* Double-quote nextcloud version in vars due to error (testing)
+
+---
+
 0.55
 
 * Make sure minio stats are public for prometheus
