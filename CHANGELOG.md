@@ -1,3 +1,9 @@
+0.64
+
+* Bump beast-of-argh version (not logged in prior commit)
+
+---
+
 0.63
 
 * Remove restarts from nomad job to allow nextcloud install to finish
