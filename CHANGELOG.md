@@ -1,3 +1,9 @@
+0.63
+
+* Remove restarts from nomad job to allow nextcloud install to finish
+
+---
+
 0.62
 
 * Bump consul, nomad, traefik, beast-of-argh versions

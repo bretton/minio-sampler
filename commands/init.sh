@@ -212,8 +212,8 @@ cat >site.yml<<"EOF"
       traefik_mount_in: /mnt/data/jaildata/traefik
       traefik_nodename: traefikconsul
       beast_base: beast-of-argh-amd64-13_1
-      beast_version: 0.0.24
-      beast_pot_name: beast-of-argh-amd64-13_1_0_0_24
+      beast_version: 0.0.25
+      beast_pot_name: beast-of-argh-amd64-13_1_0_0_25
       beast_nodename: beast
       beast_url: https://potluck.honeyguide.net/beast-of-argh/
       beast_clone_name: beast-clone
@@ -1503,10 +1503,6 @@ cat >site.yml<<"EOF"
             }
             task "nextcloud1" {
               driver = "pot"
-              restart {
-                attempts = 3      
-                delay = "30s"
-              }
               service {
                 tags = ["nginx", "www", "nextcloud"]
                 name = "nextcloud-server"
@@ -1514,13 +1510,8 @@ cat >site.yml<<"EOF"
                   check {
                     type     = "tcp"
                     name     = "tcp"
-                    interval = "300s"
+                    interval = "30s"
                     timeout  = "30s"
-                  }
-                  check_restart {
-                    limit = 0
-                    grace = "30s"
-                    ignore_warnings = false
                   }
               }
               config {
