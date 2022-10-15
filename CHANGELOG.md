@@ -1,3 +1,10 @@
+0.60
+
+* Adjusting nomad restart timing
+* Re-order ansible variables for nextcloud
+
+---
+
 0.59
 
 * Bump nextcloud version

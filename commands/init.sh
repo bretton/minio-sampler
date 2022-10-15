@@ -253,13 +253,12 @@ cat >site.yml<<"EOF"
       mariadb_nc_db_name: nextcloud
       mariadb_nc_user: nextcloud
       mariadb_nc_pass: mynextcloud1345swdwfr3t34rw
-      nextcloud_mount: /mnt/nextcloud
       nextcloud_minio: "10.100.1.3:9000"
-      nextcloud_copy_src: /root/nomadjobs/nc-config.php.in
-      nextcloud_copy_dest: /root/nc-config.php
+      nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
       nextcloud_base: nextcloud-nginx-nomad-amd64-13_1
       nextcloud_version: "0.42"
-      nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
+      nextcloud_copy_src: /root/nomadjobs/nc-config.php.in
+      nextcloud_copy_dest: /root/nc-config.php
       nextcloud_www_src: /mnt/data/jaildata/nextcloud/nextcloud_www
       nextcloud_www_dest: /usr/local/www/nextcloud
       nextcloud_storage_src: /mnt/data/jaildata/nextcloud/storage
@@ -1515,12 +1514,12 @@ cat >site.yml<<"EOF"
                   check {
                     type     = "tcp"
                     name     = "tcp"
-                    interval = "60s"
+                    interval = "300s"
                     timeout  = "30s"
                   }
                   check_restart {
-                    limit = 3
-                    grace = "600s"
+                    limit = 0
+                    grace = "30s"
                     ignore_warnings = false
                   }
               }
@@ -1529,7 +1528,7 @@ cat >site.yml<<"EOF"
                 pot = "{{ nextcloud_base }}"
                 tag = "{{ nextcloud_version }}"
                 command = "/usr/local/bin/cook"
-                args = ["-d","{{ nextcloud_mount }}","-s","{{ nextcloud_minio }}"]
+                args = ["-d","{{ nextcloud_storage_dest }}","-s","{{ nextcloud_minio }}"]
                 copy = [
                   "{{ nextcloud_copy_src }}:{{ nextcloud_copy_dest }}",
                   "{{ nextcloud_rootca_src }}:{{ nextcloud_rootca_dest }}",
