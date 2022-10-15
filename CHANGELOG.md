@@ -1,3 +1,10 @@
+0.59
+
+* Bump nextcloud version
+* Adjust nomad job to copy-in rootca.crt from minio self-signed setup
+
+---
+
 0.58
 
 * Remove vlan from minio2

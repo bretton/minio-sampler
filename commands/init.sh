@@ -258,12 +258,14 @@ cat >site.yml<<"EOF"
       nextcloud_copy_src: /root/nomadjobs/nc-config.php.in
       nextcloud_copy_dest: /root/nc-config.php
       nextcloud_base: nextcloud-nginx-nomad-amd64-13_1
-      nextcloud_version: "0.41"
+      nextcloud_version: "0.42"
       nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
       nextcloud_www_src: /mnt/data/jaildata/nextcloud/nextcloud_www
       nextcloud_www_dest: /usr/local/www/nextcloud
       nextcloud_storage_src: /mnt/data/jaildata/nextcloud/storage
       nextcloud_storage_dest: /mnt/nextcloud
+      nextcloud_rootca_src: /usr/local/etc/ssl/CAs/rootca.crt
+      nextcloud_rootca_dest: /root/rootca.crt
       nextcloud_admin_user: sampler
       nextcloud_admin_pass: sampler123
 
@@ -599,11 +601,6 @@ cat >site.yml<<"EOF"
           -out {{ local_openssl_root_cert }} \
           -subj /C=US/ST=None/L=City/O=Organisation/CN={{ minio1_hostname }}
 
-  - name: Wait for port 22 to become open, wait for 2 seconds
-    wait_for:
-      port: 22
-      delay: 2
-
   - name: Wait for ssh to become available on minio2
     become: yes
     become_user: root
@@ -748,6 +745,22 @@ cat >site.yml<<"EOF"
       chdir: "{{ local_openssl_dir }}"
       cmd: |
         cat {{ local_openssl_public_cert }} CAs/{{ local_openssl_root_cert }} >> {{ local_openssl_nginx_cert }}
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
+
+  - name: Rehash certs minio1
+    become: yes
+    become_user: root
+    shell:
+      cmd: certctl rehash
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
 
   - name: Update nginx.conf with proxy
     become: yes
@@ -1081,6 +1094,22 @@ cat >site.yml<<"EOF"
       chdir: "{{ local_openssl_dir }}"
       cmd: |
         cat {{ local_openssl_public_cert }} CAs/{{ local_openssl_root_cert }} >> {{ local_openssl_nginx_cert }}
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
+
+  - name: Rehash certs minio2
+    become: yes
+    become_user: root
+    shell:
+      cmd: certctl rehash
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
 
   - name: Enable minio sysrc entries on minio2
     become: yes
@@ -1503,6 +1532,7 @@ cat >site.yml<<"EOF"
                 args = ["-d","{{ nextcloud_mount }}","-s","{{ nextcloud_minio }}"]
                 copy = [
                   "{{ nextcloud_copy_src }}:{{ nextcloud_copy_dest }}",
+                  "{{ nextcloud_rootca_src }}:{{ nextcloud_rootca_dest }}",
                 ]
                 mount = [
                   "{{ nextcloud_www_src }}:{{ nextcloud_www_dest }}",
