@@ -1,3 +1,9 @@
+0.61
+
+* Bump nextcloud version
+
+---
+
 0.60
 
 * Adjusting nomad restart timing
