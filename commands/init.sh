@@ -184,8 +184,8 @@ cat >site.yml<<"EOF"
       gossip_key: "BBtPyNSRI+/iP8RHB514CZ5By3x1jJLu4SqTVzM4gPA="
       jails_interface: jailnet
       consul_base: consul-amd64-13_1
-      consul_version: 2.0.23
-      consul_pot_name: consul-amd64-13_1_2_0_23
+      consul_version: 2.0.24
+      consul_pot_name: consul-amd64-13_1_2_0_24
       consul_clone_name: consul-clone
       consul_url: https://potluck.honeyguide.net/consul
       consul_ip: 10.200.1.2
@@ -193,8 +193,8 @@ cat >site.yml<<"EOF"
       consul_bootstrap: 1
       consul_peers: 1.2.3.4
       nomad_base: nomad-server-amd64-13_1
-      nomad_version: 2.0.17
-      nomad_pot_name: nomad-server-amd64-13_1_2_0_17
+      nomad_version: 2.0.18
+      nomad_pot_name: nomad-server-amd64-13_1_2_0_18
       nomad_clone_name: nomad-server-clone
       nomad_ip: 10.200.1.3
       nomad_nodename: nomad
@@ -204,16 +204,16 @@ cat >site.yml<<"EOF"
       nomad_job_src: /root/nomadjobs/nextcloud.nomad
       nomad_job_dest: /root/nomadjobs/nextcloud.nomad
       traefik_base: traefik-consul-amd64-13_1
-      traefik_version: 1.3.1
-      traefik_pot_name: traefik-consul-amd64-13_1_1_3_1
+      traefik_version: 1.3.2
+      traefik_pot_name: traefik-consul-amd64-13_1_1_3_2
       traefik_clone_name: traefik-consul-clone
       traefik_url: https://potluck.honeyguide.net/traefik-consul
       traefik_ip: 10.200.1.4
       traefik_mount_in: /mnt/data/jaildata/traefik
       traefik_nodename: traefikconsul
       beast_base: beast-of-argh-amd64-13_1
-      beast_version: 0.0.23
-      beast_pot_name: beast-of-argh-amd64-13_1_0_0_23
+      beast_version: 0.0.24
+      beast_pot_name: beast-of-argh-amd64-13_1_0_0_24
       beast_nodename: beast
       beast_url: https://potluck.honeyguide.net/beast-of-argh/
       beast_clone_name: beast-clone

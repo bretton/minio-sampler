@@ -1,3 +1,9 @@
+0.62
+
+* Bump consul, nomad, traefik, beast-of-argh versions
+
+---
+
 0.61
 
 * Bump nextcloud version
