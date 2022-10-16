@@ -1,3 +1,9 @@
+0.69
+
+* Bump nextcloud version
+
+---
+
 0.68
 
 * dhclient.conf changes applied to vtnet0
