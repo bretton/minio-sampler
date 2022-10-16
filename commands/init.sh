@@ -212,8 +212,8 @@ cat >site.yml<<"EOF"
       traefik_mount_in: /mnt/data/jaildata/traefik
       traefik_nodename: traefikconsul
       beast_base: beast-of-argh-amd64-13_1
-      beast_version: "0.0.25"
-      beast_pot_name: beast-of-argh-amd64-13_1_0_0_25
+      beast_version: "0.0.26"
+      beast_pot_name: beast-of-argh-amd64-13_1_0_0_26
       beast_nodename: beast
       beast_url: https://potluck.honeyguide.net/beast-of-argh/
       beast_clone_name: beast-clone

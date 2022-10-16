@@ -1,3 +1,9 @@
+0.66
+
+* Bump beast-of-argh version for minio dashboard fixes
+
+---
+
 0.65
 
 * Bump nextcloud version
