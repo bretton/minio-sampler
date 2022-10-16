@@ -1770,8 +1770,8 @@ cat >site.yml<<"EOF"
         idmariadb=$(jls | grep {{ mariadb_clone_name }} | cut -c 1-8 | sed 's/[[:blank:]]*$//')
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "DROP DATABASE IF EXISTS {{ mariadb_nc_db_name }}"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE DATABASE {{ mariadb_nc_db_name }}"
-        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER '{{ mariadb_nc_user }}'@'10.200.1.%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
-        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on {{ mariadb_nc_db_name }}.* to '{{ mariadb_nc_user }}'@'10.200.1.%'"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER '{{ mariadb_nc_user }}'@'%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on {{ mariadb_nc_db_name }}.* to '{{ mariadb_nc_user }}'@'%'"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "FLUSH PRIVILEGES"
 
   - name: Set preparedatabase.sh permissions
@@ -2313,7 +2313,7 @@ cat >site.yml<<"EOF"
     shell:
       cmd: /root/preparedatabase.sh
 
-  - name: Add minio hosts to prometheus monitoring from outside jail
+  - name: Add minio1 hosts to prometheus monitoring from outside jail
     become: yes
     become_user: root
     copy:
@@ -2321,7 +2321,6 @@ cat >site.yml<<"EOF"
       content: |
         - targets:
           - {{ minio1_ip_address }}:9000
-          - {{ minio2_ip_address }}:9000
           labels:
             job: minio
 
@@ -2344,7 +2343,7 @@ cat >site.yml<<"EOF"
       content: |
         #!/bin/sh
         idbeast=$(jls | grep {{ beast_clone_name }} | cut -c 1-8 | sed 's/[[:blank:]]*$//')
-        jexec -U root "$idbeast" service prometheus restart
+        jexec -U root "$idbeast" service prometheus reload
 
   - name: Set prometheus reload script permissions on minio1
     ansible.builtin.file:

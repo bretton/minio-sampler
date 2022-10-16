@@ -1,3 +1,11 @@
+0.67
+
+* Remove IP restrictions on mysql user created for nextcloud
+* Add only minio1 to prometheus minio job
+* Reload prometheus instead of restart
+
+---
+
 0.66
 
 * Bump beast-of-argh version for minio dashboard fixes
