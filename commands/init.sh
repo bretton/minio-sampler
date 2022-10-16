@@ -149,6 +149,10 @@ cat >site.yml<<"EOF"
       minio_nat_gateway: 10.100.1.1
       minio1_ip_address: 10.100.1.3
       minio2_ip_address: 10.100.1.4
+      local_minio_disk1: /mnt/minio/disk1
+      local_minio_disk2: /mnt/minio/disk2
+      local_minio_disk3: /mnt/minio/disk3
+      local_minio_disk4: /mnt/minio/disk4
       minio1_disk1: https://10.100.1.3:9000/mnt/minio/disk1
       minio1_disk2: https://10.100.1.3:9000/mnt/minio/disk2
       minio1_disk3: https://10.100.1.3:9000/mnt/minio/disk3
@@ -158,16 +162,12 @@ cat >site.yml<<"EOF"
       minio2_disk3: https://10.100.1.4:9000/mnt/minio/disk3
       minio2_disk4: https://10.100.1.4:9000/mnt/minio/disk4
       minio_erasure_coding_collection: https://minio{1...2}:9000/mnt/minio/disk{1...4}
+      minio_access_key: sampler
+      minio_access_password: samplerpasswordislong
       minio_nameserver: 8.8.8.8
       minio_ssh_key: "~/.ssh/miniokey"
       minio1_ssh_port: 10122
       minio2_ssh_port: 10222
-      minio_access_key: sampler
-      minio_access_password: samplerpasswordislong
-      local_minio_disk1: /mnt/minio/disk1
-      local_minio_disk2: /mnt/minio/disk2
-      local_minio_disk3: /mnt/minio/disk3
-      local_minio_disk4: /mnt/minio/disk4
       local_openssl_dir: /usr/local/etc/ssl
       local_openssl_ca_dir: /usr/local/etc/ssl/CAs
       local_openssl_conf: openssl.conf
@@ -184,7 +184,7 @@ cat >site.yml<<"EOF"
       gossip_key: "BBtPyNSRI+/iP8RHB514CZ5By3x1jJLu4SqTVzM4gPA="
       jails_interface: jailnet
       consul_base: consul-amd64-13_1
-      consul_version: 2.0.24
+      consul_version: "2.0.24"
       consul_pot_name: consul-amd64-13_1_2_0_24
       consul_clone_name: consul-clone
       consul_url: https://potluck.honeyguide.net/consul
@@ -193,7 +193,7 @@ cat >site.yml<<"EOF"
       consul_bootstrap: 1
       consul_peers: 1.2.3.4
       nomad_base: nomad-server-amd64-13_1
-      nomad_version: 2.0.18
+      nomad_version: "2.0.18"
       nomad_pot_name: nomad-server-amd64-13_1_2_0_18
       nomad_clone_name: nomad-server-clone
       nomad_ip: 10.200.1.3
@@ -204,7 +204,7 @@ cat >site.yml<<"EOF"
       nomad_job_src: /root/nomadjobs/nextcloud.nomad
       nomad_job_dest: /root/nomadjobs/nextcloud.nomad
       traefik_base: traefik-consul-amd64-13_1
-      traefik_version: 1.3.2
+      traefik_version: "1.3.2"
       traefik_pot_name: traefik-consul-amd64-13_1_1_3_2
       traefik_clone_name: traefik-consul-clone
       traefik_url: https://potluck.honeyguide.net/traefik-consul
@@ -212,7 +212,7 @@ cat >site.yml<<"EOF"
       traefik_mount_in: /mnt/data/jaildata/traefik
       traefik_nodename: traefikconsul
       beast_base: beast-of-argh-amd64-13_1
-      beast_version: 0.0.25
+      beast_version: "0.0.25"
       beast_pot_name: beast-of-argh-amd64-13_1_0_0_25
       beast_nodename: beast
       beast_url: https://potluck.honeyguide.net/beast-of-argh/
@@ -234,10 +234,10 @@ cat >site.yml<<"EOF"
       beast_smtp_pass: "examplepass"
       beast_smtp_from: "sampler@minio-sampler.com"
       beast_alertaddress: "your@example.com"
-      beast_syslog_version: 3.37
+      beast_syslog_version: "3.37"
       beast_empty_var: ""
       mariadb_base: mariadb-amd64-13_1
-      mariadb_version: 2.0.7
+      mariadb_version: "2.0.7"
       mariadb_pot_name: mariadb-amd64-13_1_2_0_7
       mariadb_url: https://potluck.honeyguide.net/mariadb
       mariadb_nodename: mariadb
@@ -256,7 +256,7 @@ cat >site.yml<<"EOF"
       nextcloud_minio: "10.100.1.3:9000"
       nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
       nextcloud_base: nextcloud-nginx-nomad-amd64-13_1
-      nextcloud_version: "0.43"
+      nextcloud_version: "0.44"
       nextcloud_copy_src: /root/nomadjobs/nc-config.php.in
       nextcloud_copy_dest: /root/nc-config.php
       nextcloud_www_src: /mnt/data/jaildata/nextcloud/nextcloud_www
@@ -939,7 +939,7 @@ cat >site.yml<<"EOF"
               chunked_transfer_encoding off;
               proxy_buffering off;
               proxy_ssl_verify off;
-              proxy_pass https://{{ minio_nat_gateway }}:10906;
+              proxy_pass https://{{ minio1_ip_address }}:10443;
             }
           }
         }

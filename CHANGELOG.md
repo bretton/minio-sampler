@@ -1,3 +1,11 @@
+0.65
+
+* Bump nextcloud version
+* Re-order ansible vars
+* Change nginx config for nextcloud proxy_pass
+
+---
+
 0.64
 
 * Bump beast-of-argh version (not logged in prior commit)
