@@ -1,3 +1,9 @@
+0.68
+
+* dhclient.conf changes applied to vtnet0
+
+---
+
 0.67
 
 * Remove IP restrictions on mysql user created for nextcloud
