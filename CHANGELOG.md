@@ -1,6 +1,7 @@
 0.66
 
 * Bump beast-of-argh version for minio dashboard fixes
+* Fix issues with nextcloud nomad job file
 
 ---
 

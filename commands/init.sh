@@ -1510,7 +1510,7 @@ cat >site.yml<<"EOF"
                   check {
                     type     = "tcp"
                     name     = "tcp"
-                    interval = "30s"
+                    interval = "60s"
                     timeout  = "30s"
                   }
               }
@@ -1522,18 +1522,18 @@ cat >site.yml<<"EOF"
                 args = ["-d","{{ nextcloud_storage_dest }}","-s","{{ nextcloud_minio }}"]
                 copy = [
                   "{{ nextcloud_copy_src }}:{{ nextcloud_copy_dest }}",
-                  "{{ nextcloud_rootca_src }}:{{ nextcloud_rootca_dest }}",
+                  "{{ nextcloud_rootca_src }}:{{ nextcloud_rootca_dest }}"
                 ]
                 mount = [
                   "{{ nextcloud_www_src }}:{{ nextcloud_www_dest }}",
-                  "{{ nextcloud_storage_src }}:{{ nextcloud_storage_dest }}",
+                  "{{ nextcloud_storage_src }}:{{ nextcloud_storage_dest }}"
                 ]
                 port_map = {
                   http = "80"
                 }
               }
               resources {
-                cpu = 500
+                cpu = 1000
                 memory = 1000
               }
             }
