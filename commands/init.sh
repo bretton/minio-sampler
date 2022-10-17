@@ -2435,7 +2435,6 @@ Vagrant.configure("2") do |config|
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
       echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
       echo "net.inet.tcp.tolerate_missing_ts=1" >> /etc/sysctl.conf
-      echo 'interface "vtnet0" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
       service netif restart && service routing restart
       ifconfig jailnet create vlan 1001 vlandev untrusted
       ifconfig jailnet inet 10.200.1.1/24 up
@@ -2450,16 +2449,16 @@ Vagrant.configure("2") do |config|
       mkdir -p /mnt/minio
       gpart create -s GPT ada1
       gpart add -t freebsd-zfs -l minio-disk1 ada1
-      zpool create -o feature@livelist=disabled -o feature@zstd_compress=disabled -o feature@log_spacemap=disabled -m /mnt/minio/disk1 minio-disk1 ada1p1
+      zpool create -m /mnt/minio/disk1 minio-disk1 ada1p1
       gpart create -s GPT ada2
       gpart add -t freebsd-zfs -l minio-disk2 ada2
-      zpool create -o feature@livelist=disabled -o feature@zstd_compress=disabled -o feature@log_spacemap=disabled -m /mnt/minio/disk2 minio-disk2 ada2p1
+      zpool create -m /mnt/minio/disk2 minio-disk2 ada2p1
       gpart create -s GPT ada3
       gpart add -t freebsd-zfs -l minio-disk3 ada3
-      zpool create -o feature@livelist=disabled -o feature@zstd_compress=disabled -o feature@log_spacemap=disabled -m /mnt/minio/disk3 minio-disk3 ada3p1
+      zpool create -m /mnt/minio/disk3 minio-disk3 ada3p1
       gpart create -s GPT ada4
       gpart add -t freebsd-zfs -l minio-disk4 ada4
-      zpool create -o feature@livelist=disabled -o feature@zstd_compress=disabled -o feature@log_spacemap=disabled -m /mnt/minio/disk4 minio-disk4 ada4p1
+      zpool create -m /mnt/minio/disk4 minio-disk4 ada4p1
     SHELL
   end
   config.vm.define "minio2", primary: false do |node|
@@ -2514,23 +2513,22 @@ Vagrant.configure("2") do |config|
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
       echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
       echo "net.inet.tcp.tolerate_missing_ts=1" >> /etc/sysctl.conf
-      echo 'interface "vtnet0" { supersede domain-name-servers 8.8.8.8; }' >> /etc/dhclient.conf
       service netif restart && service routing restart
       echo "checking DNS resolution with ping"
       ping -c 1 google.com
       mkdir -p /mnt/minio
       gpart create -s GPT ada1
       gpart add -t freebsd-zfs -l minio-disk1 ada1
-      zpool create -o feature@livelist=disabled -o feature@zstd_compress=disabled -o feature@log_spacemap=disabled -m /mnt/minio/disk1 minio-disk1 ada1p1
+      zpool create -m /mnt/minio/disk1 minio-disk1 ada1p1
       gpart create -s GPT ada2
       gpart add -t freebsd-zfs -l minio-disk2 ada2
-      zpool create -o feature@livelist=disabled -o feature@zstd_compress=disabled -o feature@log_spacemap=disabled -m /mnt/minio/disk2 minio-disk2 ada2p1
+      zpool create -m /mnt/minio/disk2 minio-disk2 ada2p1
       gpart create -s GPT ada3
       gpart add -t freebsd-zfs -l minio-disk3 ada3
-      zpool create -o feature@livelist=disabled -o feature@zstd_compress=disabled -o feature@log_spacemap=disabled -m /mnt/minio/disk3 minio-disk3 ada3p1
+      zpool create -m /mnt/minio/disk3 minio-disk3 ada3p1
       gpart create -s GPT ada4
       gpart add -t freebsd-zfs -l minio-disk4 ada4
-      zpool create -o feature@livelist=disabled -o feature@zstd_compress=disabled -o feature@log_spacemap=disabled -m /mnt/minio/disk4 minio-disk4 ada4p1
+      zpool create -m /mnt/minio/disk4 minio-disk4 ada4p1
     SHELL
     node.vm.provision 'ansible' do |ansible|
     ansible.compatibility_mode = '2.0'

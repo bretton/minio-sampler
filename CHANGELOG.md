@@ -1,3 +1,10 @@
+0.73
+
+* Disabling dhclient.conf entry
+* Removing the disabling of zpool features, carry over from 13.0
+
+---
+
 0.72
 
 * Adding back internal nameserver, nomad pot jails not getting dns
