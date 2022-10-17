@@ -1163,8 +1163,8 @@ cat >site.yml<<"EOF"
         zfs create -o mountpoint=/mnt/data/jaildata/mariadb zroot/data/jaildata/mariadb
         mkdir -p /mnt/data/jaildata/mariadb/var_db_mysql
         zfs create -o mountpoint=/mnt/data/jaildata/nextcloud zroot/data/jaildata/nextcloud
-        mkdir -p /mnt/data/jaildata/nextcloud/nextcloud_www
-        mkdir -p /mnt/data/jaildata/nextcloud/storage
+        zfs create -o mountpoint=/mnt/data/jaildata/nextcloud/nextcloud_www zroot/data/jaildata/nextcloud/nextcloud_www
+        zfs create -o mountpoint=/mnt/data/jaildata/nextcloud/storage zroot/data/jaildata/nextcloud/storage
 
   - name: Install needed packages
     become: yes
