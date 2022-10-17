@@ -1,3 +1,10 @@
+0.72
+
+* Adding back internal nameserver, nomad pot jails not getting dns
+* Disable pf for testing
+
+---
+
 0.71
 
 * Bump nextcloud version

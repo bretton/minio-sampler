@@ -323,8 +323,8 @@ cat >site.yml<<"EOF"
     copy:
       dest: /etc/resolv.conf
       content: |
+        nameserver 10.0.2.3
         nameserver {{ minio_nameserver }}
-        #nameserver 10.0.2.3
 
   - name: Create pkg config directory
     become: yes
@@ -2252,13 +2252,13 @@ cat >site.yml<<"EOF"
     copy:
       dest: /etc/pf.conf
       content: |
-        ext_if="untrusted"
-        set skip on lo0  
-        nat on $ext_if from 10.200.1/24 to !10.200/16 -> $ext_if:0
-        pass from 10.200.1/24 to any  
-        pass in on $ext_if from 10.200/16
-        pass from 10.200/16 to 10.200/16
-        pass
+        # ext_if="untrusted"
+        # set skip on lo0  
+        # nat on $ext_if from 10.200.1/24 to !10.200/16 -> $ext_if:0
+        # pass from 10.200.1/24 to any  
+        # pass in on $ext_if from 10.200/16
+        # pass from 10.200/16 to 10.200/16
+        # pass
         ####
         # ext_if="untrusted"
         # set block-policy drop
@@ -2281,26 +2281,26 @@ cat >site.yml<<"EOF"
         # pass from 10.200.1/24 to 10.192/10
         # pass out on $ext_if
   
-  - name: Enable pf on minio1
-    become: yes
-    become_user: root
-    ansible.builtin.service:
-      name: pf
-      enabled: yes
+  # - name: Enable pf on minio1
+  #   become: yes
+  #   become_user: root
+  #   ansible.builtin.service:
+  #     name: pf
+  #     enabled: yes
 
-  - name: Enable pflog on minio1
-    become: yes
-    become_user: root
-    ansible.builtin.service:
-      name: pflog
-      enabled: yes
+  # - name: Enable pflog on minio1
+  #   become: yes
+  #   become_user: root
+  #   ansible.builtin.service:
+  #     name: pflog
+  #     enabled: yes
 
-  - name: Start pf on minio1
-    become: yes
-    become_user: root
-    ansible.builtin.service:
-      name: pf
-      state: started
+  # - name: Start pf on minio1
+  #   become: yes
+  #   become_user: root
+  #   ansible.builtin.service:
+  #     name: pf
+  #     state: started
 
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:
