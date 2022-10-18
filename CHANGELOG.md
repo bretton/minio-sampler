@@ -1,3 +1,9 @@
+0.75
+
+* Bump nextcloud version
+
+---
+
 0.74
 
 * Initiating minio using direct IP

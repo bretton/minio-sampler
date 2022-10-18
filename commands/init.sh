@@ -257,7 +257,7 @@ cat >site.yml<<"EOF"
       nextcloud_minio_alt: "10.100.1.1:10901"
       nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
       nextcloud_base: nextcloud-nginx-nomad-amd64-13_1
-      nextcloud_version: "0.47"
+      nextcloud_version: "0.48"
       nextcloud_copy_src: /root/nomadjobs/nc-config.php.in
       nextcloud_copy_dest: /root/nc-config.php
       nextcloud_www_src: /mnt/data/jaildata/nextcloud/nextcloud_www
@@ -1147,7 +1147,7 @@ cat >site.yml<<"EOF"
       cmd: |
         env MINIO_ACCESS_KEY="{{ minio_access_key }}"
         env MINIO_SECRET_KEY="{{ minio_access_password }}"
-        minio-client alias set {{ minio_resource }} https://{{ minio_nat_gateway }}:10901 {{  minio_access_key }} {{ minio_access_password }} --api S3v4  --insecure --config-dir /root/.minio-client/
+        minio-client alias set {{ minio_resource }} https://{{ minio1_ip_address }}:9000 {{  minio_access_key }} {{ minio_access_password }} --api S3v4  --insecure --config-dir /root/.minio-client/
         minio-client mb --insecure  --config-dir /root/.minio-client/ --with-lock {{ minio_resource }}/{{ minio_dataset }}
 
   - name: Setup ZFS datasets
