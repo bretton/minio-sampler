@@ -257,7 +257,7 @@ cat >site.yml<<"EOF"
       nextcloud_minio_alt: "10.100.1.1:10901"
       nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
       nextcloud_base: nextcloud-nginx-nomad-amd64-13_1
-      nextcloud_version: "0.48"
+      nextcloud_version: "0.49"
       nextcloud_copy_src: /root/nomadjobs/nc-config.php.in
       nextcloud_copy_dest: /root/nc-config.php
       nextcloud_www_src: /mnt/data/jaildata/nextcloud/nextcloud_www
