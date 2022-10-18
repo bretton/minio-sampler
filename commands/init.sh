@@ -254,6 +254,7 @@ cat >site.yml<<"EOF"
       mariadb_nc_user: nextcloud
       mariadb_nc_pass: mynextcloud1345swdwfr3t34rw
       nextcloud_minio: "10.100.1.3:9000"
+      nextcloud_minio_alt: "10.100.1.1:10901"
       nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
       nextcloud_base: nextcloud-nginx-nomad-amd64-13_1
       nextcloud_version: "0.47"

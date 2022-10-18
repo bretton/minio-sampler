@@ -1,3 +1,9 @@
+0.74
+
+* Initiating minio using direct IP
+
+---
+
 0.73
 
 * Disabling dhclient.conf entry
