@@ -1,3 +1,9 @@
+0.78
+
+* Bump nextcloud version
+
+---
+
 0.77
 
 * Bump nextcloud version
