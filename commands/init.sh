@@ -940,7 +940,7 @@ cat >site.yml<<"EOF"
               chunked_transfer_encoding off;
               proxy_buffering off;
               proxy_ssl_verify off;
-              proxy_pass https://{{ minio1_ip_address }}:10443;
+              proxy_pass https://{{ minio_nat_gateway }}:10906;
             }
           }
         }
@@ -1334,12 +1334,18 @@ cat >site.yml<<"EOF"
       content: |
         bind_addr = "{{ minio1_ip_address }}"
         datacenter = "{{ datacenter_name }}"
+        advertise {
+          # This should be the IP of THIS MACHINE and must be routable by every node
+          # in your cluster
+          http = "{{ minio1_ip_address }}"
+          rpc = "{{ minio1_ip_address }}"
+        }
         client {
           enabled = true
           options {
-          "driver.raw_exec.enable" = "1"
+            "driver.raw_exec.enable" = "1"
           }
-        servers = ["{{ nomad_ip }}"]
+          servers = ["{{ nomad_ip }}"]
         }
         plugin_dir = "/usr/local/libexec/nomad/plugins"
         consul {
@@ -1348,14 +1354,21 @@ cat >site.yml<<"EOF"
           auto_advertise = true
           client_auto_join = true
         }
+        tls {
+          http = false
+          rpc = false
+          verify_server_hostname = false
+          verify_https_client = false
+        }
         telemetry {
-         publish_allocation_metrics = true
-         publish_node_metrics = true
-         prometheus_metrics = true
-         disable_hostname = true
+          collection_interval = "15s"
+          publish_allocation_metrics = true
+          publish_node_metrics = true
+          prometheus_metrics = true
+          disable_hostname = true
         }
         enable_syslog=true
-        log_level="DEBUG"
+        log_level="WARN"
         syslog_facility="LOCAL1"
 
   - name: Set nomad client.hcl permissions
@@ -1499,7 +1512,7 @@ cat >site.yml<<"EOF"
             count = 1
             network {
               port "http" {
-                static = 10443
+                static = "10443"
               }
             }
             task "nextcloud1" {
@@ -2261,47 +2274,48 @@ cat >site.yml<<"EOF"
         # pass from 10.200/16 to 10.200/16
         # pass
         ####
-        # ext_if="untrusted"
-        # set block-policy drop
-        # set skip on lo0
-        # scrub in all
-        # block
-        # antispoof for $ext_if inet
-        # antispoof for jailnet inet
-        # pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
-        # pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
-        # pass in on $ext_if inet proto udp from port = 68 to port = 67
-        # pass out on $ext_if inet proto udp from port = 67 to port = 68
-        # pass in quick on $ext_if proto tcp from any to port 22
-        # pass out on $ext_if proto tcp from port 22 to any flags any
-        # anchor "reflect"
-        # pass on jailnet
-        # pass from 10.192/10 to !10/8
-        # pass from 10.192/10 to 10.200/16
-        # pass from 10.192/10 to 10.200.1/24
-        # pass from 10.200.1/24 to 10.192/10
-        # pass out on $ext_if
+        ext_if="untrusted"
+        set block-policy drop
+        set skip on lo0
+        scrub in all
+        block
+        antispoof for $ext_if inet
+        antispoof for jailnet inet
+        pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
+        pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
+        pass in on $ext_if inet proto udp from port = 68 to port = 67
+        pass out on $ext_if inet proto udp from port = 67 to port = 68
+        pass in quick on $ext_if proto tcp from any to port 22
+        pass out on $ext_if proto tcp from port 22 to any flags any
+        anchor "reflect"
+        pass on jailnet
+        pass from 10.192/10 to !10/8
+        pass from 10.192/10 to 10.200/16
+        pass from 10.192/10 to 10.200.1/24
+        pass from 10.200.1/24 to any
+        pass from 10.100.1/24 to any
+        pass out on $ext_if
   
-  # - name: Enable pf on minio1
-  #   become: yes
-  #   become_user: root
-  #   ansible.builtin.service:
-  #     name: pf
-  #     enabled: yes
+  - name: Enable pf on minio1
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: pf
+      enabled: yes
 
-  # - name: Enable pflog on minio1
-  #   become: yes
-  #   become_user: root
-  #   ansible.builtin.service:
-  #     name: pflog
-  #     enabled: yes
+  - name: Enable pflog on minio1
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: pflog
+      enabled: yes
 
-  # - name: Start pf on minio1
-  #   become: yes
-  #   become_user: root
-  #   ansible.builtin.service:
-  #     name: pf
-  #     state: started
+  - name: Start pf on minio1
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: pf
+      state: started
 
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:

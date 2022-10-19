@@ -1,3 +1,11 @@
+0.79
+
+* Add back pf.conf
+* Adjust nginx parameters for nextcloud
+* Update nomad client config
+
+---
+
 0.78
 
 * Bump nextcloud version
