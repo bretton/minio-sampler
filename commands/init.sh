@@ -165,6 +165,7 @@ cat >site.yml<<"EOF"
       minio_access_key: sampler
       minio_access_password: samplerpasswordislong
       minio_nameserver: 8.8.8.8
+      minio1_nomad_client_ip: 10.200.2.1
       minio_ssh_key: "~/.ssh/miniokey"
       minio1_ssh_port: 10122
       minio2_ssh_port: 10222
@@ -324,8 +325,8 @@ cat >site.yml<<"EOF"
     copy:
       dest: /etc/resolv.conf
       content: |
-        nameserver 10.0.2.3
         nameserver {{ minio_nameserver }}
+        nameserver 10.0.2.3
 
   - name: Create pkg config directory
     become: yes
@@ -940,7 +941,7 @@ cat >site.yml<<"EOF"
               chunked_transfer_encoding off;
               proxy_buffering off;
               proxy_ssl_verify off;
-              proxy_pass https://{{ minio_nat_gateway }}:10906;
+              proxy_pass https://{{ minio1_nomad_client_ip }}:10443;
             }
           }
         }
@@ -1332,13 +1333,13 @@ cat >site.yml<<"EOF"
     copy:
       dest: /usr/local/etc/nomad/client.hcl
       content: |
-        bind_addr = "{{ minio1_ip_address }}"
+        bind_addr = "{{ minio1_nomad_client_ip }}"
         datacenter = "{{ datacenter_name }}"
         advertise {
           # This should be the IP of THIS MACHINE and must be routable by every node
           # in your cluster
-          http = "{{ minio1_ip_address }}"
-          rpc = "{{ minio1_ip_address }}"
+          http = "{{ minio1_nomad_client_ip }}"
+          rpc = "{{ minio1_nomad_client_ip }}"
         }
         client {
           enabled = true
@@ -2278,22 +2279,30 @@ cat >site.yml<<"EOF"
         set block-policy drop
         set skip on lo0
         scrub in all
+        nat on $ext_if from computer:network to ! compute:network -> $ext_if:0
+        nat on $ext_if from 10.200.1/24 -> $ext_if:0
+        nat on $ext_if from 10.200.2/24 -> $ext_if:0
         block
         antispoof for $ext_if inet
         antispoof for jailnet inet
+        antispoof for compute inet
         pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
         pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
         pass in on $ext_if inet proto udp from port = 68 to port = 67
         pass out on $ext_if inet proto udp from port = 67 to port = 68
+        pass in on $ext_if inet proto udp from any to any port 123
         pass in quick on $ext_if proto tcp from any to port 22
         pass out on $ext_if proto tcp from port 22 to any flags any
-        anchor "reflect"
         pass on jailnet
+        pass on compute
+        pass from 10.200.1/24 to any
+        pass from 10.200.2/24 to any
+        pass from 10.100.1/24 to any
         pass from 10.192/10 to !10/8
         pass from 10.192/10 to 10.200/16
         pass from 10.192/10 to 10.200.1/24
-        pass from 10.200.1/24 to any
-        pass from 10.100.1/24 to any
+        pass from 10.192/10 to 10.200.2/24
+        pass from 10.192/10 to 10.100.1/24
         pass out on $ext_if
   
   - name: Enable pf on minio1
@@ -2442,7 +2451,7 @@ Vagrant.configure("2") do |config|
       sysrc ifconfig_untrusted="SYNCDHCP"
       sysrc ifconfig_vtnet1="inet ${NETWORK}.3 netmask 255.255.255.0"
       sysrc ifconfig_vtnet2="inet ${ACCESSIP} netmask 255.255.255.0"
-      sysctl security.jail.allow_raw_sockets=1
+      sysctl -w security.jail.allow_raw_sockets=1
       sysctl -w net.inet.tcp.msl=3000
       sysctl -w security.jail.allow_raw_sockets=1
       sysctl -w net.inet.tcp.tolerate_missing_ts=1
@@ -2453,11 +2462,16 @@ Vagrant.configure("2") do |config|
       service netif restart && service routing restart
       ifconfig jailnet create vlan 1001 vlandev untrusted
       ifconfig jailnet inet 10.200.1.1/24 up
-      sysrc vlans_untrusted="jailnet"
+      ifconfig compute create vlan 1006 vlandev untrusted
+      ifconfig compute inet 10.200.2.1/24 up
+      sysrc vlans_untrusted="jailnet compute"
       sysrc create_args_jailnet="vlan 1001"
       sysrc ifconfig_jailnet="inet 10.200.1.1/24"
-      sysrc static_routes="jailstatic"
+      sysrc create_args_compute="vlan 1006"
+      sysrc ifconfig_compute="inet 10.200.2.1/24"
+      sysrc static_routes="jailstatic computestatic"
       sysrc route_jailstatic="-net 10.200.1.0/24 10.200.1.1"
+      sysrc route_computestatic="-net 10.200.2.0/24 10.200.2.1"
       service netif restart && service routing restart
       echo "checking DNS resolution with ping"
       ping -c 1 google.com
@@ -2520,7 +2534,7 @@ Vagrant.configure("2") do |config|
       sysrc ifconfig_vtnet0_name="untrusted"
       sysrc ifconfig_untrusted="SYNCDHCP"
       sysrc ifconfig_vtnet1="inet ${NETWORK}.4 netmask 255.255.255.0"
-      sysctl security.jail.allow_raw_sockets=1
+      sysctl -w security.jail.allow_raw_sockets=1
       sysctl -w net.inet.tcp.msl=3000
       sysctl -w security.jail.allow_raw_sockets=1
       sysctl -w net.inet.tcp.tolerate_missing_ts=1

@@ -1,3 +1,11 @@
+0.80
+
+* Sysctl tweaks
+* Adjust resolv.conf again
+* Adjusting minio1 pf.conf
+
+---
+
 0.79
 
 * Add back pf.conf
