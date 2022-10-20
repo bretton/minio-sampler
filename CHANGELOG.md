@@ -1,3 +1,11 @@
+0.81
+
+* adjustments to nextcloud and accessing minio or mysql
+* another pf.conf setup
+* remove second vlan on minio1
+
+---
+
 0.80
 
 * Sysctl tweaks

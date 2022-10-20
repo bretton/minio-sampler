@@ -1572,6 +1572,8 @@ cat >site.yml<<"EOF"
             1 => '{{ minio1_ip_address }}:10443',
             2 => '{{ minio1_ip_address }}:9000',
             3 => '{{ minio_access_ip }}:10443',
+            4 => '{{ minio_access_ip }}:10901,
+            5 => '{{ minio_access_ip }}:10910,
           ),
           'objectstore' =>
            array (
@@ -1583,8 +1585,8 @@ cat >site.yml<<"EOF"
               'secret' => '{{ minio_access_password }}', // your secret
               'use_ssl' => true,
               'region' => '',
-              'hostname' => '{{ minio1_ip_address }}',
-              'port' => '9000',
+              'hostname' => '{{ minio_access_ip }}',
+              'port' => '10901',
               'use_path_style' => true,
             ),
           ),
@@ -1599,8 +1601,8 @@ cat >site.yml<<"EOF"
           'dbtype' => 'mysql',
           'version' => '23.0.5.1',
           'dbname' => '{{ mariadb_nc_db_name }}',
-          'dbhost' => '{{ mariadb_ip }}',
-          'dbport' => '3306',
+          'dbhost' => '{{ minio_access_ip }}',
+          'dbport' => '10910',
           'dbtableprefix' => 'oc_',
           'dbuser' => '{{ mariadb_nc_user }}',
           'dbpassword' => '{{ mariadb_nc_pass }}',
@@ -2267,43 +2269,46 @@ cat >site.yml<<"EOF"
     copy:
       dest: /etc/pf.conf
       content: |
-        # ext_if="untrusted"
-        # set skip on lo0  
-        # nat on $ext_if from 10.200.1/24 to !10.200/16 -> $ext_if:0
-        # pass from 10.200.1/24 to any  
-        # pass in on $ext_if from 10.200/16
-        # pass from 10.200/16 to 10.200/16
-        # pass
-        ####
         ext_if="untrusted"
-        set block-policy drop
-        set skip on lo0
-        scrub in all
-        nat on $ext_if from computer:network to ! compute:network -> $ext_if:0
-        nat on $ext_if from 10.200.1/24 -> $ext_if:0
-        nat on $ext_if from 10.200.2/24 -> $ext_if:0
-        block
-        antispoof for $ext_if inet
-        antispoof for jailnet inet
-        antispoof for compute inet
-        pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
-        pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
-        pass in on $ext_if inet proto udp from port = 68 to port = 67
-        pass out on $ext_if inet proto udp from port = 67 to port = 68
-        pass in on $ext_if inet proto udp from any to any port 123
-        pass in quick on $ext_if proto tcp from any to port 22
-        pass out on $ext_if proto tcp from port 22 to any flags any
-        pass on jailnet
-        pass on compute
+        set skip on lo0  
+        nat on $ext_if from 10.200.1/24 to !10.200/16 -> $ext_if:0
         pass from 10.200.1/24 to any
-        pass from 10.200.2/24 to any
         pass from 10.100.1/24 to any
-        pass from 10.192/10 to !10/8
-        pass from 10.192/10 to 10.200/16
-        pass from 10.192/10 to 10.200.1/24
-        pass from 10.192/10 to 10.200.2/24
-        pass from 10.192/10 to 10.100.1/24
-        pass out on $ext_if
+        pass in on $ext_if from 10.200/16
+        pass in on $ext_if from 10.100/16
+        pass from 10.200/16 to 10.200/16
+        pass from 10.100/16 to 10.100/16
+        pass
+        ####
+        # ext_if="untrusted"
+        # set block-policy drop
+        # set skip on lo0
+        # scrub in all
+        # nat on $ext_if from computer:network to ! compute:network -> $ext_if:0
+        # nat on $ext_if from 10.200.1/24 -> $ext_if:0
+        # nat on $ext_if from 10.200.2/24 -> $ext_if:0
+        # block
+        # antispoof for $ext_if inet
+        # antispoof for jailnet inet
+        # antispoof for compute inet
+        # pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
+        # pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
+        # pass in on $ext_if inet proto udp from port = 68 to port = 67
+        # pass out on $ext_if inet proto udp from port = 67 to port = 68
+        # pass in on $ext_if inet proto udp from any to any port 123
+        # pass in quick on $ext_if proto tcp from any to port 22
+        # pass out on $ext_if proto tcp from port 22 to any flags any
+        # pass on jailnet
+        # pass on compute
+        # pass from 10.200.1/24 to any
+        # pass from 10.200.2/24 to any
+        # pass from 10.100.1/24 to any
+        # pass from 10.192/10 to !10/8
+        # pass from 10.192/10 to 10.200/16
+        # pass from 10.192/10 to 10.200.1/24
+        # pass from 10.192/10 to 10.200.2/24
+        # pass from 10.192/10 to 10.100.1/24
+        # pass out on $ext_if
   
   - name: Enable pf on minio1
     become: yes
@@ -2437,13 +2442,12 @@ Vagrant.configure("2") do |config|
     node.vm.network :forwarded_port, guest: 4646, host_ip: "${NETWORK}.1", host: 10907, id: "minio1-nomad"
     node.vm.network :forwarded_port, guest: 8500, host_ip: "${NETWORK}.1", host: 10908, id: "minio1-consul"
     node.vm.network :forwarded_port, guest: 9002, host_ip: "${NETWORK}.1", host: 10909, id: "minio1-traefik"
+    node.vm.network :forwarded_port, guest: 3306, host_ip: "${NETWORK}.1", host: 10910, id: "minio1-mysql"
     end
     node.vm.network :private_network, ip: "${NETWORK}.3", auto_config: false
     node.vm.network :public_network, ip: "${ACCESSIP}", auto_config: false
     node.vm.provision "shell", run: "always", inline: <<-SHELL
       sysrc ipv6_network_interfaces="none"
-      sysrc defaultrouter="${GATEWAY}"
-      sysrc gateway_enable="YES"
       ifconfig vtnet0 name untrusted
       ifconfig vtnet1 "${NETWORK}.3" netmask 255.255.255.0 up
       ifconfig vtnet2 "${ACCESSIP}" netmask 255.255.255.0 up
@@ -2451,27 +2455,22 @@ Vagrant.configure("2") do |config|
       sysrc ifconfig_untrusted="SYNCDHCP"
       sysrc ifconfig_vtnet1="inet ${NETWORK}.3 netmask 255.255.255.0"
       sysrc ifconfig_vtnet2="inet ${ACCESSIP} netmask 255.255.255.0"
+      sysrc defaultrouter="${GATEWAY}"
+      sysrc gateway_enable="YES"
       sysctl -w security.jail.allow_raw_sockets=1
       sysctl -w net.inet.tcp.msl=3000
-      sysctl -w security.jail.allow_raw_sockets=1
       sysctl -w net.inet.tcp.tolerate_missing_ts=1
       echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
-      echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
       echo "net.inet.tcp.tolerate_missing_ts=1" >> /etc/sysctl.conf
       service netif restart && service routing restart
       ifconfig jailnet create vlan 1001 vlandev untrusted
       ifconfig jailnet inet 10.200.1.1/24 up
-      ifconfig compute create vlan 1006 vlandev untrusted
-      ifconfig compute inet 10.200.2.1/24 up
-      sysrc vlans_untrusted="jailnet compute"
+      sysrc vlans_untrusted="jailnet"
       sysrc create_args_jailnet="vlan 1001"
       sysrc ifconfig_jailnet="inet 10.200.1.1/24"
-      sysrc create_args_compute="vlan 1006"
-      sysrc ifconfig_compute="inet 10.200.2.1/24"
-      sysrc static_routes="jailstatic computestatic"
+      sysrc static_routes="jailstatic"
       sysrc route_jailstatic="-net 10.200.1.0/24 10.200.1.1"
-      sysrc route_computestatic="-net 10.200.2.0/24 10.200.2.1"
       service netif restart && service routing restart
       echo "checking DNS resolution with ping"
       ping -c 1 google.com
@@ -2536,11 +2535,9 @@ Vagrant.configure("2") do |config|
       sysrc ifconfig_vtnet1="inet ${NETWORK}.4 netmask 255.255.255.0"
       sysctl -w security.jail.allow_raw_sockets=1
       sysctl -w net.inet.tcp.msl=3000
-      sysctl -w security.jail.allow_raw_sockets=1
       sysctl -w net.inet.tcp.tolerate_missing_ts=1
       echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
       echo "net.inet.tcp.msl=3000" >> /etc/sysctl.conf
-      echo "security.jail.allow_raw_sockets=1" >> /etc/sysctl.conf
       echo "net.inet.tcp.tolerate_missing_ts=1" >> /etc/sysctl.conf
       service netif restart && service routing restart
       echo "checking DNS resolution with ping"
