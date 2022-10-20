@@ -1,3 +1,10 @@
+0.82
+
+* Adjust nomad client.hcl
+* Adjust nomad job
+
+---
+
 0.81
 
 * adjustments to nextcloud and accessing minio or mysql

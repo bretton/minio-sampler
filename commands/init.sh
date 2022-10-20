@@ -1333,13 +1333,13 @@ cat >site.yml<<"EOF"
     copy:
       dest: /usr/local/etc/nomad/client.hcl
       content: |
-        bind_addr = "{{ minio1_nomad_client_ip }}"
+        bind_addr = "{{ minio1_ip_address }}"
         datacenter = "{{ datacenter_name }}"
         advertise {
           # This should be the IP of THIS MACHINE and must be routable by every node
           # in your cluster
-          http = "{{ minio1_nomad_client_ip }}"
-          rpc = "{{ minio1_nomad_client_ip }}"
+          http = "{{ minio1_ip_address }}"
+          rpc = "{{ minio1_ip_address }}"
         }
         client {
           enabled = true
@@ -1511,6 +1511,12 @@ cat >site.yml<<"EOF"
           type        = "service"
           group "group1" {
             count = 1
+            update {
+              max_parallel = 1
+              min_healthy_time = "30s"
+              healthy_deadline = "10m"
+              progress_deadline = "15m"
+            }
             network {
               port "http" {
                 static = "10443"
