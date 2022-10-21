@@ -1,3 +1,11 @@
+0.88
+
+* Adding back second set ssh port forwards
+* Adjusting nomad client.hcl
+* Adjusting nextcloud trusted hosts to IP addresses only
+
+---
+
 0.87
 
 * Commenting out ssh service check due to timing problems

@@ -165,10 +165,10 @@ cat >site.yml<<"EOF"
       minio_access_key: sampler
       minio_access_password: samplerpasswordislong
       minio_nameserver: 8.8.8.8
-      minio1_nomad_client_ip: 10.200.2.1
+      minio1_nomad_client_ip: 10.100.1.3
       minio_ssh_key: "~/.ssh/miniokey"
-      minio1_ssh_port: 2222
-      minio2_ssh_port: 2200
+      minio1_ssh_port: 12222
+      minio2_ssh_port: 12223
       local_openssl_dir: /usr/local/etc/ssl
       local_openssl_ca_dir: /usr/local/etc/ssl/CAs
       local_openssl_conf: openssl.conf
@@ -602,15 +602,15 @@ cat >site.yml<<"EOF"
           -out {{ local_openssl_root_cert }} \
           -subj /C=US/ST=None/L=City/O=Organisation/CN={{ minio1_hostname }}
 
-  # - name: Wait for ssh to become available on minio1
-  #   become: yes
-  #   become_user: root
-  #   wait_for:
-  #     host: "{{ minio_nat_gateway }}"
-  #     port: "{{ minio1_ssh_port }}"
-  #     delay: 10
-  #     timeout: 120
-  #     state: started
+  - name: Wait for ssh to become available on minio1
+    become: yes
+    become_user: root
+    wait_for:
+      host: "{{ minio_nat_gateway }}"
+      port: "{{ minio1_ssh_port }}"
+      delay: 10
+      timeout: 120
+      state: started
 
   - name: Run ssh-keyscan on minio2 (mitigating an error that crops up otherwise)
     become: yes
@@ -1575,11 +1575,9 @@ cat >site.yml<<"EOF"
           'trusted_domains' =>
           array (
             0 => 'nextcloud.{{ minio1_hostname }}',
-            1 => '{{ minio1_ip_address }}:10443',
-            2 => '{{ minio1_ip_address }}:9000',
-            3 => '{{ minio_access_ip }}:10443',
-            4 => '{{ minio_access_ip }}:10901,
-            5 => '{{ minio_access_ip }}:10910,
+            1 => '{{ minio1_ip_address }}',
+            2 => '{{ minio_access_ip }}',
+            3 => '{{ mariadb_ip }}',
           ),
           'objectstore' =>
            array (
@@ -2440,6 +2438,7 @@ Vagrant.configure("2") do |config|
       vb.customize ["setextradata", :id,
         "VBoxInternal/Devices/ahci/0/LUN#[0]/Config/IgnoreFlush", "0"]
       vb.default_nic_type = "virtio"
+    node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1", host: 12222, id: "minio1-ssh"
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1", host: 10901, id: "minio1-minio"
     node.vm.network :forwarded_port, guest: 10443, host_ip: "${NETWORK}.1", host: 10906, id: "minio1-nextcloud"
     node.vm.network :forwarded_port, guest: 3306, host_ip: "${NETWORK}.1", host: 10910, id: "minio1-mysql"
@@ -2521,6 +2520,7 @@ Vagrant.configure("2") do |config|
       vb.customize ["setextradata", :id,
         "VBoxInternal/Devices/ahci/0/LUN#[0]/Config/IgnoreFlush", "0"]
       vb.default_nic_type = "virtio"
+    node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1", host: 12223, id: "minio2-ssh"
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1", host: 10902, id: "minio2-minio"
     end
     node.vm.network :private_network, ip: "${NETWORK}.4", auto_config: false
