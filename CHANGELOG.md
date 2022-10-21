@@ -1,3 +1,9 @@
+0.83
+
+* Adjusting Vagrantfile for various options
+
+---
+
 0.82
 
 * Adjust nomad client.hcl

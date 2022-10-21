@@ -2421,6 +2421,7 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--ioapic", "on"]
       vb.customize ["modifyvm", :id, "--vrde", "off"]
       vb.customize ["modifyvm", :id, "--audio", "none"]
+      vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
       vb.customize ["createhd", "--filename", "minio1-disk1.vdi", "--size", "${DISKSIZE}"]
       vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 1, "--device", 0, "--type", "hdd", "--medium", "minio1-disk1.vdi"]
       vb.customize ["createhd", "--filename", "minio1-disk2.vdi", "--size", "${DISKSIZE}"]
@@ -2450,7 +2451,7 @@ Vagrant.configure("2") do |config|
     node.vm.network :forwarded_port, guest: 9002, host_ip: "${NETWORK}.1", host: 10909, id: "minio1-traefik"
     node.vm.network :forwarded_port, guest: 3306, host_ip: "${NETWORK}.1", host: 10910, id: "minio1-mysql"
     end
-    node.vm.network :private_network, ip: "${NETWORK}.3", auto_config: false
+    node.vm.network :private_network, ip: "${NETWORK}.3", auto_config: false, virtualbox__intnet: true
     node.vm.network :public_network, ip: "${ACCESSIP}", auto_config: false
     node.vm.provision "shell", run: "always", inline: <<-SHELL
       sysrc ipv6_network_interfaces="none"
@@ -2510,6 +2511,7 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--ioapic", "on"]
       vb.customize ["modifyvm", :id, "--vrde", "off"]
       vb.customize ["modifyvm", :id, "--audio", "none"]
+      vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
       vb.customize ["createhd", "--filename", "minio2-disk1.vdi", "--size", "${DISKSIZE}"]
       vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 1, "--device", 0, "--type", "hdd", "--medium", "minio2-disk1.vdi"]
       vb.customize ["createhd", "--filename", "minio2-disk2.vdi", "--size", "${DISKSIZE}"]
@@ -2529,7 +2531,7 @@ Vagrant.configure("2") do |config|
     node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1", host: 10222, id: "minio2-ssh"
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1", host: 10902, id: "minio2-minio"
     end
-    node.vm.network :private_network, ip: "${NETWORK}.4", auto_config: false
+    node.vm.network :private_network, ip: "${NETWORK}.4", auto_config: false, virtualbox__intnet: true
     node.vm.provision "shell", run: "always", inline: <<-SHELL
       sysrc ipv6_network_interfaces="none"
       sysrc defaultrouter="${GATEWAY}"
