@@ -1,3 +1,10 @@
+0.86
+
+* Remove intnet option, ssh times out too often
+* Add back hwvirtex
+
+---
+
 0.85
 
 * Fix ssh ports
