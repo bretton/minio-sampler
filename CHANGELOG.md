@@ -1,3 +1,10 @@
+0.84
+
+* Trimming down Vagrantfile
+* Removing double ssh port forwards
+
+---
+
 0.83
 
 * Adjusting Vagrantfile for various options

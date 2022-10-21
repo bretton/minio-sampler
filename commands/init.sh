@@ -167,8 +167,8 @@ cat >site.yml<<"EOF"
       minio_nameserver: 8.8.8.8
       minio1_nomad_client_ip: 10.200.2.1
       minio_ssh_key: "~/.ssh/miniokey"
-      minio1_ssh_port: 10122
-      minio2_ssh_port: 10222
+      minio1_ssh_port: 2022
+      minio2_ssh_port: 2023
       local_openssl_dir: /usr/local/etc/ssl
       local_openssl_ca_dir: /usr/local/etc/ssl/CAs
       local_openssl_conf: openssl.conf
@@ -2421,7 +2421,6 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--ioapic", "on"]
       vb.customize ["modifyvm", :id, "--vrde", "off"]
       vb.customize ["modifyvm", :id, "--audio", "none"]
-      vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
       vb.customize ["createhd", "--filename", "minio1-disk1.vdi", "--size", "${DISKSIZE}"]
       vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 1, "--device", 0, "--type", "hdd", "--medium", "minio1-disk1.vdi"]
       vb.customize ["createhd", "--filename", "minio1-disk2.vdi", "--size", "${DISKSIZE}"]
@@ -2440,15 +2439,8 @@ Vagrant.configure("2") do |config|
       vb.customize ["setextradata", :id,
         "VBoxInternal/Devices/ahci/0/LUN#[0]/Config/IgnoreFlush", "0"]
       vb.default_nic_type = "virtio"
-    node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1", host: 10122, id: "minio1-ssh"
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1", host: 10901, id: "minio1-minio"
-    node.vm.network :forwarded_port, guest: 3000, host_ip: "${NETWORK}.1", host: 10903, id: "minio1-grafana"
-    node.vm.network :forwarded_port, guest: 9090, host_ip: "${NETWORK}.1", host: 10904, id: "minio1-prometheus"
-    node.vm.network :forwarded_port, guest: 9093, host_ip: "${NETWORK}.1", host: 10905, id: "minio1-alertmanager"
     node.vm.network :forwarded_port, guest: 10443, host_ip: "${NETWORK}.1", host: 10906, id: "minio1-nextcloud"
-    node.vm.network :forwarded_port, guest: 4646, host_ip: "${NETWORK}.1", host: 10907, id: "minio1-nomad"
-    node.vm.network :forwarded_port, guest: 8500, host_ip: "${NETWORK}.1", host: 10908, id: "minio1-consul"
-    node.vm.network :forwarded_port, guest: 9002, host_ip: "${NETWORK}.1", host: 10909, id: "minio1-traefik"
     node.vm.network :forwarded_port, guest: 3306, host_ip: "${NETWORK}.1", host: 10910, id: "minio1-mysql"
     end
     node.vm.network :private_network, ip: "${NETWORK}.3", auto_config: false, virtualbox__intnet: true
@@ -2511,7 +2503,6 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--ioapic", "on"]
       vb.customize ["modifyvm", :id, "--vrde", "off"]
       vb.customize ["modifyvm", :id, "--audio", "none"]
-      vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
       vb.customize ["createhd", "--filename", "minio2-disk1.vdi", "--size", "${DISKSIZE}"]
       vb.customize ["storageattach", :id, "--storagectl", "SATA Controller", "--port", 1, "--device", 0, "--type", "hdd", "--medium", "minio2-disk1.vdi"]
       vb.customize ["createhd", "--filename", "minio2-disk2.vdi", "--size", "${DISKSIZE}"]
@@ -2528,19 +2519,18 @@ Vagrant.configure("2") do |config|
       vb.customize ["setextradata", :id,
         "VBoxInternal/Devices/ahci/0/LUN#[0]/Config/IgnoreFlush", "0"]
       vb.default_nic_type = "virtio"
-    node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1", host: 10222, id: "minio2-ssh"
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1", host: 10902, id: "minio2-minio"
     end
     node.vm.network :private_network, ip: "${NETWORK}.4", auto_config: false, virtualbox__intnet: true
     node.vm.provision "shell", run: "always", inline: <<-SHELL
       sysrc ipv6_network_interfaces="none"
-      sysrc defaultrouter="${GATEWAY}"
-      sysrc gateway_enable="YES"
       ifconfig vtnet0 name untrusted
       ifconfig vtnet1 "${NETWORK}.4" netmask 255.255.255.0 up
       sysrc ifconfig_vtnet0_name="untrusted"
       sysrc ifconfig_untrusted="SYNCDHCP"
       sysrc ifconfig_vtnet1="inet ${NETWORK}.4 netmask 255.255.255.0"
+      sysrc defaultrouter="${GATEWAY}"
+      sysrc gateway_enable="YES"
       sysctl -w security.jail.allow_raw_sockets=1
       sysctl -w net.inet.tcp.msl=3000
       sysctl -w net.inet.tcp.tolerate_missing_ts=1
