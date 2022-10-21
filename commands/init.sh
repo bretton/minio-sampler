@@ -167,8 +167,8 @@ cat >site.yml<<"EOF"
       minio_nameserver: 8.8.8.8
       minio1_nomad_client_ip: 10.200.2.1
       minio_ssh_key: "~/.ssh/miniokey"
-      minio1_ssh_port: 2022
-      minio2_ssh_port: 2023
+      minio1_ssh_port: 2222
+      minio2_ssh_port: 2223
       local_openssl_dir: /usr/local/etc/ssl
       local_openssl_ca_dir: /usr/local/etc/ssl/CAs
       local_openssl_conf: openssl.conf
