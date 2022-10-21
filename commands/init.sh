@@ -602,15 +602,15 @@ cat >site.yml<<"EOF"
           -out {{ local_openssl_root_cert }} \
           -subj /C=US/ST=None/L=City/O=Organisation/CN={{ minio1_hostname }}
 
-  - name: Wait for ssh to become available on minio2
-    become: yes
-    become_user: root
-    wait_for:
-      host: "{{ minio_nat_gateway }}"
-      port: "{{ minio1_ssh_port }}"
-      delay: 10
-      timeout: 90
-      state: started
+  # - name: Wait for ssh to become available on minio1
+  #   become: yes
+  #   become_user: root
+  #   wait_for:
+  #     host: "{{ minio_nat_gateway }}"
+  #     port: "{{ minio1_ssh_port }}"
+  #     delay: 10
+  #     timeout: 120
+  #     state: started
 
   - name: Run ssh-keyscan on minio2 (mitigating an error that crops up otherwise)
     become: yes
@@ -631,7 +631,7 @@ cat >site.yml<<"EOF"
       host: "{{ minio_nat_gateway }}"
       port: "{{ minio2_ssh_port }}"
       delay: 10
-      timeout: 90
+      timeout: 120
       state: started
 
   - name: Copy CA key to minio2

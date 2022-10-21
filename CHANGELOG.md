@@ -1,3 +1,9 @@
+0.87
+
+* Commenting out ssh service check due to timing problems
+
+---
+
 0.86
 
 * Remove intnet option, ssh times out too often
