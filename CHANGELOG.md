@@ -1,3 +1,9 @@
+0.91
+
+* Adding additional virtualbox settings to Vagrantfile
+
+---
+
 0.90
 
 * Nomad client back on first server
