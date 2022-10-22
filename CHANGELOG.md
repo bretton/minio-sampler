@@ -1,3 +1,10 @@
+0.89
+
+* New approach with nomad client on minio2
+* Nextcloud instance will run from minio2
+
+---
+
 0.88
 
 * Adding back second set ssh port forwards

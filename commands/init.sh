@@ -166,6 +166,7 @@ cat >site.yml<<"EOF"
       minio_access_password: samplerpasswordislong
       minio_nameserver: 8.8.8.8
       minio1_nomad_client_ip: 10.100.1.3
+      minio2_nomad_client_ip: 10.100.1.4
       minio_ssh_key: "~/.ssh/miniokey"
       minio1_ssh_port: 12222
       minio2_ssh_port: 12223
@@ -941,7 +942,7 @@ cat >site.yml<<"EOF"
               chunked_transfer_encoding off;
               proxy_buffering off;
               proxy_ssl_verify off;
-              proxy_pass https://{{ minio1_nomad_client_ip }}:10443;
+              proxy_pass https://{{ minio2_nomad_client_ip }}:10443;
             }
           }
         }
@@ -1164,9 +1165,6 @@ cat >site.yml<<"EOF"
         zfs create -o mountpoint=/mnt/data/jaildata/beast zroot/data/jaildata/beast
         zfs create -o mountpoint=/mnt/data/jaildata/mariadb zroot/data/jaildata/mariadb
         mkdir -p /mnt/data/jaildata/mariadb/var_db_mysql
-        zfs create -o mountpoint=/mnt/data/jaildata/nextcloud zroot/data/jaildata/nextcloud
-        zfs create -o mountpoint=/mnt/data/jaildata/nextcloud/nextcloud_www zroot/data/jaildata/nextcloud/nextcloud_www
-        zfs create -o mountpoint=/mnt/data/jaildata/nextcloud/storage zroot/data/jaildata/nextcloud/storage
 
   - name: Install needed packages
     become: yes
@@ -1174,8 +1172,6 @@ cat >site.yml<<"EOF"
     ansible.builtin.package:
       name:
         - consul
-        - nomad
-        - nomad-pot-driver
         - node_exporter
         - pot
         - potnet
@@ -1321,123 +1317,6 @@ cat >site.yml<<"EOF"
         sysrc node_exporter_user=nodeexport
         sysrc node_exporter_group=nodeexport
         service node_exporter restart
-
-  - name: Wait for port 22 to become open, wait for 2 seconds
-    wait_for:
-      port: 22
-      delay: 2
-
-  - name: Setup nomad client.hcl minio1
-    become: yes
-    become_user: root
-    copy:
-      dest: /usr/local/etc/nomad/client.hcl
-      content: |
-        bind_addr = "{{ minio1_ip_address }}"
-        datacenter = "{{ datacenter_name }}"
-        advertise {
-          # This should be the IP of THIS MACHINE and must be routable by every node
-          # in your cluster
-          http = "{{ minio1_ip_address }}"
-          rpc = "{{ minio1_ip_address }}"
-        }
-        client {
-          enabled = true
-          options {
-            "driver.raw_exec.enable" = "1"
-          }
-          servers = ["{{ nomad_ip }}"]
-        }
-        plugin_dir = "/usr/local/libexec/nomad/plugins"
-        consul {
-          address = "127.0.0.1:8500"
-          client_service_name = "{{ minio1_hostname }}"
-          auto_advertise = true
-          client_auto_join = true
-        }
-        tls {
-          http = false
-          rpc = false
-          verify_server_hostname = false
-          verify_https_client = false
-        }
-        telemetry {
-          collection_interval = "15s"
-          publish_allocation_metrics = true
-          publish_node_metrics = true
-          prometheus_metrics = true
-          disable_hostname = true
-        }
-        enable_syslog=true
-        log_level="WARN"
-        syslog_facility="LOCAL1"
-
-  - name: Set nomad client.hcl permissions
-    ansible.builtin.file:
-      path: "/usr/local/etc/nomad/client.hcl"
-      mode: '0644'
-      owner: consul
-      group: wheel
-
-  - name: Remove nomad server.hcl
-    become: yes
-    become_user: root
-    shell:
-      cmd: |
-        rm -r /usr/local/etc/nomad/server.hcl
-
-  - name: Set nomad tmp permissions
-    ansible.builtin.file:
-      path: "/var/tmp/nomad"
-      state: directory
-      mode: '0700'
-      owner: root
-      group: wheel
-
-  - name: setup nomad client log file
-    become: yes
-    become_user: root
-    shell:
-      cmd: |
-        mkdir -p /var/log/nomad
-        touch /var/log/nomad/nomad.log
-
-  - name: setup nomad client sysrc entries
-    become: yes
-    become_user: root
-    shell:
-      cmd: |
-        sysrc nomad_user="root"
-        sysrc nomad_group="wheel"
-        sysrc nomad_env="PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:/bin"
-        sysrc nomad_args="-config=/usr/local/etc/nomad/client.hcl"
-        sysrc nomad_debug="YES"
-
-  - name: Enable nomad
-    become: yes
-    become_user: root
-    ansible.builtin.service:
-      name: nomad
-      enabled: yes
-
-  - name: Start nomad
-    become: yes
-    become_user: root
-    ansible.builtin.service:
-      name: nomad
-      state: started
-
-  - name: Wait for port 22 to become open, wait for 2 seconds
-    wait_for:
-      port: 22
-      delay: 2
-
-  - name: download the nextcloud pot image so it's already local
-    become: yes
-    become_user: root
-    shell:
-      cmd: |
-        pot import -p {{ nextcloud_base }} -t {{ nextcloud_version }} -U {{ nextcloud_url }}
 
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:
@@ -1690,13 +1569,6 @@ cat >site.yml<<"EOF"
       port: 22
       delay: 2
 
-  - name: Restart nomad
-    become: yes
-    become_user: root
-    ansible.builtin.service:
-      name: nomad
-      state: restarted
-
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:
       port: 22
@@ -1798,29 +1670,6 @@ cat >site.yml<<"EOF"
   - name: Set preparedatabase.sh permissions
     ansible.builtin.file:
       path: "/root/preparedatabase.sh"
-      mode: '0755'
-      owner: root
-      group: wheel
-
-  - name: Copy over preparenextcloud.sh script
-    become: yes
-    become_user: root
-    copy:
-      dest: /root/preparenextcloud.sh
-      content: |
-        #!/bin/sh
-        idnextcloud=$(jls | grep nextcloud | cut -c 1-8 |sed 's/[[:blank:]]*$//')
-        jexec -U root "$idnextcloud" su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:install \
-          --database "mysql" \
-          --database-name "{{ mariadb_nc_db_name }}" \
-          --database-user "{{ mariadb_nc_user }}" \
-          --database-pass "{{ mariadb_nc_pass }}" \
-          --admin-user "{{ nextcloud_admin_user }}" \
-          --admin-pass "{{ nextcloud_admin_pass }}"'
-
-  - name: Set preparenextcloud.sh permissions
-    ansible.builtin.file:
-      path: "/root/preparenextcloud.sh"
       mode: '0755'
       owner: root
       group: wheel
@@ -2017,22 +1866,74 @@ cat >site.yml<<"EOF"
       port: 22
       delay: 2
 
-  - name: Setup ZFS datasets
+  - name: Setup ZFS datasets and nomadjobs directory
     become: yes
     become_user: root
     shell:
       cmd: |
         zfs create -o mountpoint=/mnt/srv zroot/srv
+        zfs create -o mountpoint=/mnt/srv/pot zroot/srv/pot
         zfs create -o mountpoint=/mnt/data zroot/data
+        zfs create -o mountpoint=/mnt/data/jaildata zroot/data/jaildata
+        zfs create -o mountpoint=/mnt/data/jaildata/nextcloud zroot/data/jaildata/nextcloud
+        zfs create -o mountpoint=/mnt/data/jaildata/nextcloud/nextcloud_www zroot/data/jaildata/nextcloud/nextcloud_www
+        zfs create -o mountpoint=/mnt/data/jaildata/nextcloud/storage zroot/data/jaildata/nextcloud/storage
+        mkdir -p /root/nomadjobs
 
-  - name: Install needed packages
+  - name: Install packages
     become: yes
     become_user: root
     ansible.builtin.package:
       name:
         - consul
+        - nomad
+        - nomad-pot-driver
         - node_exporter
+        - pot
+        - potnet
       state: present
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
+
+  - name: HOTFIX temp fix to patch pot common.sh
+    become: yes
+    become_user: root
+    shell:
+      cmd: |
+        fetch -o /tmp/common.sh.in "https://raw.githubusercontent.com/bsdpot/pot/f033266a26ecd144dc047bb7f35929112407dfc0/share/pot/common.sh"
+        cp -f /tmp/common.sh.in /usr/local/share/pot/common.sh
+
+  - name: Setup pot.conf
+    become: yes
+    become_user: root
+    copy:
+      dest: /usr/local/etc/pot/pot.conf
+      content: |
+        POT_ZFS_ROOT=zroot/srv/pot
+        POT_FS_ROOT=/mnt/srv/pot
+        POT_CACHE=/var/cache/pot
+        POT_TMP=/tmp
+        POT_NETWORK=10.192.0.0/10
+        POT_NETMASK=255.192.0.0
+        POT_GATEWAY=10.192.0.1
+        POT_EXTIF=untrusted
+
+  - name: Initiate pot
+    become: yes
+    become_user: root
+    shell:
+      cmd: |
+        pot init -v
+
+  - name: Enable pot
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: pot
+      enabled: yes
 
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:
@@ -2132,6 +2033,228 @@ cat >site.yml<<"EOF"
         sysrc node_exporter_user=nodeexport
         sysrc node_exporter_group=nodeexport
         service node_exporter restart
+
+  - name: Wait for port 22 to become open, wait for 2 seconds
+    wait_for:
+      port: 22
+      delay: 2
+
+  - name: Setup nomad client.hcl minio2
+    become: yes
+    become_user: root
+    copy:
+      dest: /usr/local/etc/nomad/client.hcl
+      content: |
+        bind_addr = "{{ minio2_ip_address }}"
+        datacenter = "{{ datacenter_name }}"
+        advertise {
+          # This should be the IP of THIS MACHINE and must be routable by every node
+          # in your cluster
+          http = "{{ minio2_ip_address }}"
+          rpc = "{{ minio2_ip_address }}"
+        }
+        client {
+          enabled = true
+          options {
+            "driver.raw_exec.enable" = "1"
+          }
+          servers = ["{{ nomad_ip }}"]
+        }
+        plugin_dir = "/usr/local/libexec/nomad/plugins"
+        consul {
+          address = "127.0.0.1:8500"
+          client_service_name = "{{ minio2_hostname }}"
+          auto_advertise = true
+          client_auto_join = true
+        }
+        tls {
+          http = false
+          rpc = false
+          verify_server_hostname = false
+          verify_https_client = false
+        }
+        telemetry {
+          collection_interval = "15s"
+          publish_allocation_metrics = true
+          publish_node_metrics = true
+          prometheus_metrics = true
+          disable_hostname = true
+        }
+        enable_syslog=true
+        log_level="WARN"
+        syslog_facility="LOCAL1"
+
+  - name: Set nomad client.hcl permissions
+    ansible.builtin.file:
+      path: "/usr/local/etc/nomad/client.hcl"
+      mode: '0644'
+      owner: consul
+      group: wheel
+
+  - name: Remove nomad server.hcl
+    become: yes
+    become_user: root
+    shell:
+      cmd: |
+        rm -r /usr/local/etc/nomad/server.hcl
+
+  - name: Set nomad tmp permissions
+    ansible.builtin.file:
+      path: "/var/tmp/nomad"
+      state: directory
+      mode: '0700'
+      owner: root
+      group: wheel
+
+  - name: setup nomad client log file
+    become: yes
+    become_user: root
+    shell:
+      cmd: |
+        mkdir -p /var/log/nomad
+        touch /var/log/nomad/nomad.log
+
+  - name: setup nomad client sysrc entries
+    become: yes
+    become_user: root
+    shell:
+      cmd: |
+        sysrc nomad_user="root"
+        sysrc nomad_group="wheel"
+        sysrc nomad_env="PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/sbin:/bin"
+        sysrc nomad_args="-config=/usr/local/etc/nomad/client.hcl"
+        sysrc nomad_debug="YES"
+
+  - name: Enable nomad
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: nomad
+      enabled: yes
+
+  - name: Start nomad
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: nomad
+      state: started
+
+  - name: download the nextcloud pot image so it's already local
+    become: yes
+    become_user: root
+    shell:
+      cmd: |
+        pot import -p {{ nextcloud_base }} -t {{ nextcloud_version }} -U {{ nextcloud_url }}
+
+  - name: Setup nc-config.php
+    become: yes
+    become_user: root
+    copy:
+      dest: "{{ nextcloud_copy_src }}"
+      content: |
+        <?php
+        $CONFIG = array (
+          'instanceid' => '',
+          'passwordsalt' => '',
+          'secret' => '',
+          'trusted_domains' =>
+          array (
+            0 => 'nextcloud.{{ minio2_hostname }}',
+            1 => '{{ minio1_ip_address }}',
+            2 => '{{ minio2_ip_address }}',
+            3 => '{{ minio_access_ip }}',
+            4 => '{{ mariadb_ip }}',
+          ),
+          'objectstore' =>
+           array (
+            'class' => 'OC\\Files\\ObjectStore\\S3',
+            'arguments' => array (
+              'bucket' => '{{ minio_dataset }}', // your bucket name
+              'autocreate' => true,
+              'key'    => '{{ minio_access_key }}', // your key
+              'secret' => '{{ minio_access_password }}', // your secret
+              'use_ssl' => true,
+              'region' => '',
+              'hostname' => '{{ minio_access_ip }}',
+              'port' => '10901',
+              'use_path_style' => true,
+            ),
+          ),
+          'datadirectory' => '{{ nextcloud_storage_dest }}',
+          'loglevel' => 1,
+          'logfile' => '{{ nextcloud_storage_dest }}/nextcloud.log',
+          'memcache.local' => '\\OC\\Memcache\\APCu',
+          'filelocking.enabled' => false,
+          'overwrite.cli.url' => '',
+          'overwritehost' => '',
+          'overwriteprotocol' => 'https',
+          'dbtype' => 'mysql',
+          'version' => '23.0.5.1',
+          'dbname' => '{{ mariadb_nc_db_name }}',
+          'dbhost' => '{{ minio_access_ip }}',
+          'dbport' => '10910',
+          'dbtableprefix' => 'oc_',
+          'dbuser' => '{{ mariadb_nc_user }}',
+          'dbpassword' => '{{ mariadb_nc_pass }}',
+          'installed' => true,
+          'mail_from_address' => 'nextcloud',
+          'mail_smtpmode' => 'smtp',
+          'mail_smtpauthtype' => 'PLAIN',
+          'mail_domain' => '{{ minio2_hostname }}',
+          'mail_smtphost' => '',
+          'mail_smtpport' => '',
+          'mail_smtpauth' => 1,
+          'maintenance' => false,
+          'theme' => '',
+          'twofactor_enforced' => 'false',
+          'twofactor_enforced_groups' =>
+          array (
+          ),
+          'twofactor_enforced_excluded_groups' =>
+          array (
+            0 => 'no_2fa',
+          ),
+          'updater.release.channel' => 'stable',
+          'ldapIgnoreNamingRules' => false,
+          'ldapProviderFactory' => 'OCA\\User_LDAP\\LDAPProviderFactory',
+          'encryption_skip_signature_check' => true,
+          'encryption.key_storage_migrated' => false,
+          'mysql.utf8mb4' => true,
+          'mail_sendmailmode' => 'smtp',
+          'mail_smtpname' => 'nextcloud@{{ minio2_hostname }}',
+          'mail_smtppassword' => '',
+          'mail_smtpsecure' => 'ssl',
+          'app.mail.verify-tls-peer' => false,
+          'app_install_overwrite' =>
+          array (
+            0 => 'camerarawpreviews',
+            1 => 'keeweb',
+            2 => 'calendar',
+          ),
+        );
+
+  - name: Copy over preparenextcloud.sh script
+    become: yes
+    become_user: root
+    copy:
+      dest: /root/preparenextcloud.sh
+      content: |
+        #!/bin/sh
+        idnextcloud=$(jls | grep nextcloud | cut -c 1-8 |sed 's/[[:blank:]]*$//')
+        jexec -U root "$idnextcloud" su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:install \
+          --database "mysql" \
+          --database-name "{{ mariadb_nc_db_name }}" \
+          --database-user "{{ mariadb_nc_user }}" \
+          --database-pass "{{ mariadb_nc_pass }}" \
+          --admin-user "{{ nextcloud_admin_user }}" \
+          --admin-pass "{{ nextcloud_admin_pass }}"'
+
+  - name: Set preparenextcloud.sh permissions
+    ansible.builtin.file:
+      path: "/root/preparenextcloud.sh"
+      mode: '0755'
+      owner: root
+      group: wheel
 
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:
@@ -2288,9 +2411,8 @@ cat >site.yml<<"EOF"
         # set block-policy drop
         # set skip on lo0
         # scrub in all
-        # nat on $ext_if from computer:network to ! compute:network -> $ext_if:0
+        # nat on $ext_if from jailnet:network to ! jailbet:network -> $ext_if:0
         # nat on $ext_if from 10.200.1/24 -> $ext_if:0
-        # nat on $ext_if from 10.200.2/24 -> $ext_if:0
         # block
         # antispoof for $ext_if inet
         # antispoof for jailnet inet
@@ -2440,7 +2562,6 @@ Vagrant.configure("2") do |config|
       vb.default_nic_type = "virtio"
     node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1", host: 12222, id: "minio1-ssh"
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1", host: 10901, id: "minio1-minio"
-    node.vm.network :forwarded_port, guest: 10443, host_ip: "${NETWORK}.1", host: 10906, id: "minio1-nextcloud"
     node.vm.network :forwarded_port, guest: 3306, host_ip: "${NETWORK}.1", host: 10910, id: "minio1-mysql"
     end
     node.vm.network :private_network, ip: "${NETWORK}.3", auto_config: false
@@ -2522,6 +2643,7 @@ Vagrant.configure("2") do |config|
       vb.default_nic_type = "virtio"
     node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1", host: 12223, id: "minio2-ssh"
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1", host: 10902, id: "minio2-minio"
+    node.vm.network :forwarded_port, guest: 10443, host_ip: "${NETWORK}.1", host: 10906, id: "minio2-nextcloud"
     end
     node.vm.network :private_network, ip: "${NETWORK}.4", auto_config: false
     node.vm.provision "shell", run: "always", inline: <<-SHELL
