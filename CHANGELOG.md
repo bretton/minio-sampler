@@ -1,3 +1,11 @@
+0.90
+
+* Nomad client back on first server
+* Nextcloud back on first server
+* New pf.conf
+
+---
+
 0.89
 
 * New approach with nomad client on minio2
