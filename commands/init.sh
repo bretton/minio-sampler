@@ -2263,16 +2263,11 @@ cat >site.yml<<"EOF"
         ext_if = "untrusted"
         jail_if = "jailnet"
         nat on $ext_if from ($jail_if:network) to ! ($jail_if:network) -> $ext_if
-        set skip on $jail_if
         set skip on lo0
+        set skip on vtnet1
+        set skip on vtnet2
         block drop in
         pass out on $ext_if
-        pass in on $ext_if proto tcp to $ext_if port 22
-        pass in on $ext_if proto tcp to $ext_if port 80
-        pass in on $ext_if proto tcp to $ext_if port 443
-        pass in on $ext_if proto tcp to $ext_if port 3306
-        pass in on $ext_if proto tcp to $ext_if port 9000
-        pass in on $ext_if proto tcp to $ext_if port 10443
   
   - name: Enable pf on minio1
     become: yes
@@ -2379,13 +2374,7 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--ioapic", "on"]
       vb.customize ["modifyvm", :id, "--vrde", "off"]
       vb.customize ["modifyvm", :id, "--audio", "none"]
-      vb.customize ["modifyvm", :id, "--pae", "on"]
-      vb.customize ["modifyvm", :id, "--longmode", "on"]
-      vb.customize ["modifyvm", :id, "--hpet", "on"]
       vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
-      vb.customize ["modifyvm", :id, "--nestedpaging", "on"]
-      vb.customize ["modifyvm", :id, "--largepages", "on"]
-      vb.customize ["modifyvm", :id, "--vtxvpid", "on"]
       vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
       vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
       vb.customize ["modifyvm", :id, "--nictype3", "virtio"]
@@ -2468,13 +2457,7 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--ioapic", "on"]
       vb.customize ["modifyvm", :id, "--vrde", "off"]
       vb.customize ["modifyvm", :id, "--audio", "none"]
-      vb.customize ["modifyvm", :id, "--pae", "on"]
-      vb.customize ["modifyvm", :id, "--longmode", "on"]
-      vb.customize ["modifyvm", :id, "--hpet", "on"]
       vb.customize ["modifyvm", :id, "--hwvirtex", "on"]
-      vb.customize ["modifyvm", :id, "--nestedpaging", "on"]
-      vb.customize ["modifyvm", :id, "--largepages", "on"]
-      vb.customize ["modifyvm", :id, "--vtxvpid", "on"]
       vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
       vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
       vb.customize ["modifyvm", :id, "--nicpromisc1", "allow-all"]

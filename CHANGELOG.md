@@ -1,3 +1,10 @@
+0.92
+
+* Previous changes removed, makes everything slower
+* pf.conf still not right
+
+---
+
 0.91
 
 * Adding additional virtualbox settings to Vagrantfile
