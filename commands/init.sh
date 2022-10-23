@@ -165,7 +165,7 @@ cat >site.yml<<"EOF"
       minio_access_key: sampler
       minio_access_password: samplerpasswordislong
       minio_nameserver: 8.8.8.8
-      minio1_nomad_client_ip: 10.100.1.3
+      minio1_nomad_client_ip: 10.200.2.1
       minio2_nomad_client_ip: 10.100.1.4
       minio_ssh_key: "~/.ssh/miniokey"
       minio1_ssh_port: 12222
@@ -1459,6 +1459,7 @@ cat >site.yml<<"EOF"
             1 => '{{ minio1_ip_address }}',
             2 => '{{ minio_access_ip }}',
             3 => '{{ mariadb_ip }}',
+            4 => '{{ minio1_nomad_client_ip }}',
           ),
           'objectstore' =>
            array (
@@ -1470,7 +1471,7 @@ cat >site.yml<<"EOF"
               'secret' => '{{ minio_access_password }}', // your secret
               'use_ssl' => true,
               'region' => '',
-              'hostname' => '{{ minio_access_ip }}',
+              'hostname' => '{{ minio1_nomad_client_ip }}',
               'port' => '29000',
               'use_path_style' => true,
             ),
@@ -1584,13 +1585,13 @@ cat >site.yml<<"EOF"
     copy:
       dest: /usr/local/etc/nomad/client.hcl
       content: |
-        bind_addr = "{{ minio1_ip_address }}"
+        bind_addr = "{{ minio1_nomad_client_ip }}"
         datacenter = "{{ datacenter_name }}"
         advertise {
           # This should be the IP of THIS MACHINE and must be routable by every node
           # in your cluster
-          http = "{{ minio1_ip_address }}"
-          rpc = "{{ minio1_ip_address }}"
+          http = "{{ minio1_nomad_client_ip }}"
+          rpc = "{{ minio1_nomad_client_ip }}"
         }
         client {
           enabled = true
@@ -2262,12 +2263,14 @@ cat >site.yml<<"EOF"
       content: |
         ext_if = "untrusted"
         jail_if = "jailnet"
+        compute_if = "compute"
         nat on $ext_if from ($jail_if:network) to ! ($jail_if:network) -> $ext_if
+        nat on $ext_if from ($compute_if:network) to ! ($compute_if:network) -> $ext_if
+        nat on $ext_if from 10.200.1/24 -> $ext_if:0
+        nat on $ext_if from 10.200.2/24 -> $ext_if:0
         set skip on lo0
-        set skip on vtnet1
-        set skip on vtnet2
-        block drop in
         pass out on $ext_if
+        pass
   
   - name: Enable pf on minio1
     become: yes
@@ -2421,11 +2424,14 @@ Vagrant.configure("2") do |config|
       service netif restart && service routing restart
       ifconfig jailnet create vlan 1001 vlandev untrusted
       ifconfig jailnet inet 10.200.1.1/24 up
-      sysrc vlans_untrusted="jailnet"
+      sysrc vlans_untrusted="jailnet compute"
       sysrc create_args_jailnet="vlan 1001"
       sysrc ifconfig_jailnet="inet 10.200.1.1/24"
-      sysrc static_routes="jailstatic"
+      sysrc create_args_compute="vlan 1006"
+      sysrc ifconfig_compute="inet 10.200.2.1/24"
+      sysrc static_routes="jailstatic computestatic"
       sysrc route_jailstatic="-net 10.200.1.0/24 10.200.1.1"
+      sysrc route_computestatic="-net 10.200.2.0/24 10.200.2.1"
       service netif restart && service routing restart
       echo "checking DNS resolution with ping"
       ping -c 1 google.com

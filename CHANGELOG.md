@@ -1,3 +1,10 @@
+0.94
+
+* Switch nomad client to use vlan under untrusted (vtnet0)
+* Adjust pf.conf
+
+---
+
 0.93
 
 * Exposing minio and mysql on public IP for nomad jail access
