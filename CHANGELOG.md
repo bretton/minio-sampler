@@ -1,3 +1,9 @@
+0.95
+
+* Fixing missed updates 
+
+---
+
 0.94
 
 * Switch nomad client to use vlan under untrusted (vtnet0)

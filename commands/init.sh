@@ -1471,8 +1471,8 @@ cat >site.yml<<"EOF"
               'secret' => '{{ minio_access_password }}', // your secret
               'use_ssl' => true,
               'region' => '',
-              'hostname' => '{{ minio1_nomad_client_ip }}',
-              'port' => '29000',
+              'hostname' => '{{ minio1_ip_address }}',
+              'port' => '9000',
               'use_path_style' => true,
             ),
           ),
@@ -2424,6 +2424,8 @@ Vagrant.configure("2") do |config|
       service netif restart && service routing restart
       ifconfig jailnet create vlan 1001 vlandev untrusted
       ifconfig jailnet inet 10.200.1.1/24 up
+      ifconfig compute create vlan 1006 vlandev untrusted
+      ifconfig compute inet 10.200.2.1/24 up
       sysrc vlans_untrusted="jailnet compute"
       sysrc create_args_jailnet="vlan 1001"
       sysrc ifconfig_jailnet="inet 10.200.1.1/24"
