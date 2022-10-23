@@ -2262,15 +2262,26 @@ cat >site.yml<<"EOF"
       dest: /etc/pf.conf
       content: |
         ext_if = "untrusted"
-        jail_if = "jailnet"
-        compute_if = "compute"
-        nat on $ext_if from ($jail_if:network) to ! ($jail_if:network) -> $ext_if
-        nat on $ext_if from ($compute_if:network) to ! ($compute_if:network) -> $ext_if
-        nat on $ext_if from 10.200.1/24 -> $ext_if:0
-        nat on $ext_if from 10.200.2/24 -> $ext_if:0
+        set block-policy drop
         set skip on lo0
+        scrub in all
+        block
+        antispoof for $ext_if inet
+        antispoof for jailnet inet
+        antispoof for compute inet
+        pass inet proto icmp icmp-type {echorep, echoreq, unreach, squench, timex}
+        pass on $ext_if inet6 proto icmp6 icmp6-type {unreach, toobig, neighbrsol, neighbradv, echoreq, echorep, timex}
+        pass in on $ext_if inet proto udp from port = 68 to port = 67
+        pass out on $ext_if inet proto udp from port = 67 to port = 68
+        pass in quick on $ext_if proto tcp from any to port 22
+        pass out on $ext_if proto tcp from port 22 to any flags any
+        pass on jailnet
+        pass on compute
+        pass from 10.192/10 to !10/8
+        pass from 10.192/10 to 10.100/16
+        pass from 10.192/10 to 10.200/16
+        pass from 10.200.2/24 to 10.192/10
         pass out on $ext_if
-        pass
   
   - name: Enable pf on minio1
     become: yes
@@ -2399,6 +2410,7 @@ Vagrant.configure("2") do |config|
     node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1", host: 12222, id: "minio1-ssh"
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1", host: 10901, id: "minio1-minio"
     node.vm.network :forwarded_port, guest: 3306, host_ip: "${NETWORK}.1", host: 10910, id: "minio1-mysql"
+    node.vm.network :forwarded_port, guest: 10443, host_ip: "${NETWORK}.1", host: 10906, id: "minio1-nextcloud"
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${ACCESSIP}", host: 29000, id: "minio1-minio-public"
     node.vm.network :forwarded_port, guest: 3306, host_ip: "${ACCESSIP}", host: 23306, id: "minio1-mysql-public"
     end
@@ -2486,7 +2498,6 @@ Vagrant.configure("2") do |config|
       vb.default_nic_type = "virtio"
     node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1", host: 12223, id: "minio2-ssh"
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1", host: 10902, id: "minio2-minio"
-    node.vm.network :forwarded_port, guest: 10443, host_ip: "${NETWORK}.1", host: 10906, id: "minio2-nextcloud"
     end
     node.vm.network :private_network, ip: "${NETWORK}.4", auto_config: false
     node.vm.provision "shell", run: "always", inline: <<-SHELL

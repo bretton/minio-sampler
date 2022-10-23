@@ -1,3 +1,10 @@
+0.96
+
+* Port forward needed to be moved back to minio1
+* revised pf.conf again, no nat
+
+---
+
 0.95
 
 * Fixing missed updates 
