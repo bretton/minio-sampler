@@ -1,3 +1,10 @@
+0.93
+
+* Exposing minio and mysql on public IP for nomad jail access
+* Networking issues between nomad jail and jailnet vlan with pot images
+
+---
+
 0.92
 
 * Previous changes removed, makes everything slower

@@ -1471,7 +1471,7 @@ cat >site.yml<<"EOF"
               'use_ssl' => true,
               'region' => '',
               'hostname' => '{{ minio_access_ip }}',
-              'port' => '10901',
+              'port' => '29000',
               'use_path_style' => true,
             ),
           ),
@@ -1487,7 +1487,7 @@ cat >site.yml<<"EOF"
           'version' => '23.0.5.1',
           'dbname' => '{{ mariadb_nc_db_name }}',
           'dbhost' => '{{ minio_access_ip }}',
-          'dbport' => '10910',
+          'dbport' => '23306',
           'dbtableprefix' => 'oc_',
           'dbuser' => '{{ mariadb_nc_user }}',
           'dbpassword' => '{{ mariadb_nc_pass }}',
@@ -2396,6 +2396,8 @@ Vagrant.configure("2") do |config|
     node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1", host: 12222, id: "minio1-ssh"
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1", host: 10901, id: "minio1-minio"
     node.vm.network :forwarded_port, guest: 3306, host_ip: "${NETWORK}.1", host: 10910, id: "minio1-mysql"
+    node.vm.network :forwarded_port, guest: 9000, host_ip: "${ACCESSIP}", host: 29000, id: "minio1-minio-public"
+    node.vm.network :forwarded_port, guest: 3306, host_ip: "${ACCESSIP}", host: 23306, id: "minio1-mysql-public"
     end
     node.vm.network :private_network, ip: "${NETWORK}.3", auto_config: false
     node.vm.network :public_network, ip: "${ACCESSIP}", auto_config: false
