@@ -1,3 +1,9 @@
+0.97
+
+* Trying POT_EXTRA_EXTIF option
+
+---
+
 0.96
 
 * Port forward needed to be moved back to minio1
