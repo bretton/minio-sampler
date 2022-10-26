@@ -165,7 +165,7 @@ cat >site.yml<<"EOF"
       minio_access_key: sampler
       minio_access_password: samplerpasswordislong
       minio_nameserver: 8.8.8.8
-      minio1_nomad_client_ip: 10.200.2.1
+      minio1_nomad_client_ip: 10.100.1.3
       minio2_nomad_client_ip: 10.100.1.4
       minio_ssh_key: "~/.ssh/miniokey"
       minio1_ssh_port: 12222

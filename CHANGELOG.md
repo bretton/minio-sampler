@@ -1,3 +1,9 @@
+0.98
+
+* Change nomad client ip
+
+---
+
 0.97
 
 * Trying POT_EXTRA_EXTIF option
