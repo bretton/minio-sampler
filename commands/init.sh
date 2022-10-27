@@ -1206,8 +1206,6 @@ cat >site.yml<<"EOF"
         POT_NETMASK=255.192.0.0
         POT_GATEWAY=10.192.0.1
         POT_EXTIF=untrusted
-        POT_EXTRA_EXTIF=vtnet1
-        POT_NETWORK_vtnet1=10.100.1.0/24
 
   - name: Initiate pot
     become: yes
