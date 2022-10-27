@@ -1479,7 +1479,7 @@ cat >site.yml<<"EOF"
           'datadirectory' => '{{ nextcloud_storage_dest }}',
           'loglevel' => 1,
           'logfile' => '{{ nextcloud_storage_dest }}/nextcloud.log',
-          'memcache.local' => '\\OC\\Memcache\\APCu',
+          'memcache.local' => '\OC\Memcache\APCu',
           'filelocking.enabled' => false,
           'overwrite.cli.url' => '',
           'overwritehost' => '',
@@ -1487,8 +1487,8 @@ cat >site.yml<<"EOF"
           'dbtype' => 'mysql',
           'version' => '23.0.5.1',
           'dbname' => '{{ mariadb_nc_db_name }}',
-          'dbhost' => '{{ minio_access_ip }}',
-          'dbport' => '23306',
+          'dbhost' => '{{ mariadb_ip }}',
+          'dbport' => '3306',
           'dbtableprefix' => 'oc_',
           'dbuser' => '{{ mariadb_nc_user }}',
           'dbpassword' => '{{ mariadb_nc_pass }}',
@@ -2275,11 +2275,25 @@ cat >site.yml<<"EOF"
         pass out on $ext_if inet proto udp from port = 67 to port = 68
         pass in quick on $ext_if proto tcp from any to port 22
         pass out on $ext_if proto tcp from port 22 to any flags any
+        pass in on $ext_if proto tcp from any to port 80
+        pass out on $ext_if proto tcp from port 80 to any flags any
+        pass in on $ext_if proto tcp from any to port 443
+        pass out on $ext_if proto tcp from port 443 to any flags any
+        pass in on $ext_if proto tcp from any to port 3306
+        pass out on $ext_if proto tcp from port 3306 to any flags any
+        pass in on $ext_if proto tcp from any to port 9000
+        pass out on $ext_if proto tcp from port 9000 to any flags any
+        pass in on $ext_if proto tcp from any to port 10443
+        pass out on $ext_if proto tcp from port 10443 to any flags any
         pass on jailnet
         pass on compute
+        pass on vtnet1
+        pass on vtnet2
+        pass on bridge0
         pass from 10.192/10 to !10/8
         pass from 10.192/10 to 10.100/16
         pass from 10.192/10 to 10.200/16
+        pass from 10.200.1/24 to 10.192/10
         pass from 10.200.2/24 to 10.192/10
         pass out on $ext_if
   
