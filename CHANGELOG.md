@@ -1,3 +1,9 @@
+0.103
+
+* Fix database setup script host wildcard
+
+---
+
 0.102
 
 * enable ngx_stream_module
