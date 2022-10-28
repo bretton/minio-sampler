@@ -1,3 +1,9 @@
+0.102
+
+* enable ngx_stream_module
+
+---
+
 0.101
 
 * nginx-full for stream functionality

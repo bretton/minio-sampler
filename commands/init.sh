@@ -760,6 +760,7 @@ cat >site.yml<<"EOF"
     copy:
       dest: /usr/local/etc/nginx/nginx.conf
       content: |
+        load_module /usr/local/libexec/nginx/ngx_stream_module.so;
         worker_processes  1;
         error_log /var/log/nginx/error.log;
         events {
