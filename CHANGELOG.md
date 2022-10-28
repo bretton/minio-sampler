@@ -1,3 +1,10 @@
+0.101
+
+* nginx-full for stream functionality
+* add mysql proxy to nginx
+
+---
+
 0.100
 
 * Experimenting with pf.conf changes

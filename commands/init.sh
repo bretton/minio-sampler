@@ -368,7 +368,7 @@ cat >site.yml<<"EOF"
         - openntpd
         - pftop
         - openssl
-        - nginx
+        - nginx-full
         - minio
         - minio-client
         - py39-minio
@@ -764,6 +764,15 @@ cat >site.yml<<"EOF"
         error_log /var/log/nginx/error.log;
         events {
           worker_connections 4096;
+        }
+        stream {
+          upstream nextclouddb {
+            server {{ mariadb_ip }}:3306;
+          }
+          server {
+            listen 33306;
+            proxy_pass nextclouddb;
+          }
         }
         http {
           include mime.types;
@@ -1471,8 +1480,8 @@ cat >site.yml<<"EOF"
               'secret' => '{{ minio_access_password }}', // your secret
               'use_ssl' => true,
               'region' => '',
-              'hostname' => '{{ minio1_ip_address }}',
-              'port' => '9000',
+              'hostname' => '{{ minio_access_ip }}',
+              'port' => '19000',
               'use_path_style' => true,
             ),
           ),
@@ -1487,8 +1496,8 @@ cat >site.yml<<"EOF"
           'dbtype' => 'mysql',
           'version' => '23.0.5.1',
           'dbname' => '{{ mariadb_nc_db_name }}',
-          'dbhost' => '{{ mariadb_ip }}',
-          'dbport' => '3306',
+          'dbhost' => '{{ minio_access_ip }}',
+          'dbport' => '33306',
           'dbtableprefix' => 'oc_',
           'dbuser' => '{{ mariadb_nc_user }}',
           'dbpassword' => '{{ mariadb_nc_pass }}',
@@ -2287,14 +2296,11 @@ cat >site.yml<<"EOF"
         pass out on $ext_if proto tcp from port 10443 to any flags any
         pass on jailnet
         pass on compute
-        pass on vtnet1
-        pass on vtnet2
         pass on bridge0
-        pass from 10.192/10 to !10/8
-        pass from 10.192/10 to 10.100/16
-        pass from 10.192/10 to 10.200/16
-        pass from 10.200.1/24 to 10.192/10
-        pass from 10.200.2/24 to 10.192/10
+        pass in on $ext_if from 10.100.1/24
+        pass from 10.192/10 to any
+        pass from 10.200.1/24 to any
+        pass from 10.200.2/24 to any
         pass out on $ext_if
   
   - name: Enable pf on minio1
@@ -2441,6 +2447,7 @@ Vagrant.configure("2") do |config|
       sysrc ifconfig_vtnet2="inet ${ACCESSIP} netmask 255.255.255.0"
       sysrc defaultrouter="${GATEWAY}"
       sysrc gateway_enable="YES"
+      sed -i ".orig" -e "s|files mdns dns|files mdns_minimal [NOTFOUND=return] dns mdns|g" /etc/nsswitch.conf
       sysctl -w security.jail.allow_raw_sockets=1
       sysctl -w net.inet.tcp.msl=3000
       sysctl -w net.inet.tcp.tolerate_missing_ts=1
@@ -2523,6 +2530,7 @@ Vagrant.configure("2") do |config|
       sysrc ifconfig_vtnet1="inet ${NETWORK}.4 netmask 255.255.255.0"
       sysrc defaultrouter="${GATEWAY}"
       sysrc gateway_enable="YES"
+      sed -i ".orig" -e "s|files mdns dns|files mdns_minimal [NOTFOUND=return] dns mdns|g" /etc/nsswitch.conf
       sysctl -w security.jail.allow_raw_sockets=1
       sysctl -w net.inet.tcp.msl=3000
       sysctl -w net.inet.tcp.tolerate_missing_ts=1
