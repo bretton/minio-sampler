@@ -1783,8 +1783,8 @@ cat >site.yml<<"EOF"
         idmariadb=$(jls | grep {{ mariadb_clone_name }} | cut -c 1-8 | sed 's/[[:blank:]]*$//')
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "DROP DATABASE IF EXISTS {{ mariadb_nc_db_name }}"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE DATABASE {{ mariadb_nc_db_name }}"
-        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER '{{ mariadb_nc_user }}'@'10.%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
-        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on {{ mariadb_nc_db_name }}.* to '{{ mariadb_nc_user }}'@'10.%'"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER {{ mariadb_nc_user }}@'%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on {{ mariadb_nc_db_name }}.* to {{ mariadb_nc_user }}@'%'"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "FLUSH PRIVILEGES"
 
   - name: Set preparedatabase.sh permissions
