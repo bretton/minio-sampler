@@ -1,3 +1,9 @@
+0.104
+
+* Bump packbox step image size to 40gb
+
+---
+
 0.103
 
 * Fix database setup script host wildcard
