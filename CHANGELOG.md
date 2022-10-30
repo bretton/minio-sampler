@@ -1,3 +1,9 @@
+0.105
+
+* New mariadb version
+
+---
+
 0.104
 
 * Bump packbox step image size to 40gb

@@ -239,8 +239,8 @@ cat >site.yml<<"EOF"
       beast_syslog_version: "3.37"
       beast_empty_var: ""
       mariadb_base: mariadb-amd64-13_1
-      mariadb_version: "2.0.7"
-      mariadb_pot_name: mariadb-amd64-13_1_2_0_7
+      mariadb_version: "2.0.8"
+      mariadb_pot_name: mariadb-amd64-13_1_2_0_8
       mariadb_url: https://potluck.honeyguide.net/mariadb
       mariadb_nodename: mariadb
       mariadb_clone_name: mariadb-clone
