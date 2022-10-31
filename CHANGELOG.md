@@ -1,3 +1,9 @@
+0.106
+
+* New nextcloud version
+
+---
+
 0.105
 
 * New mariadb version
