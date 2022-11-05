@@ -1,3 +1,10 @@
+0.108
+
+* Brain derp, fixed common.sh
+* Pull hotfix from the minio-sampler repo
+
+---
+
 0.107
 
 * Add working common.sh for pot

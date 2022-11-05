@@ -56,8 +56,8 @@ function read_ini_file() {
   IFS=$'\n' && ini=( ${ini} ) # convert to line-array
   ini=( ${ini[*]//;*/} )      # remove comments with ;
   ini=( ${ini[*]//#*/} )      # remove comments with #
-  ini=( ${ini[*]/\	=/=} )  # remove tabs before =
-  ini=( ${ini[*]/=\	/=} )   # remove tabs be =
+  ini=( ${ini[*]/\  =/=} )  # remove tabs before =
+  ini=( ${ini[*]/=\ /=} )   # remove tabs be =
   ini=( ${ini[*]/\ =\ /=} )   # remove anything with a space around =
   ini=( ${ini[*]/#\\[/\}$'\n'cfg_section_} ) # set section prefix
   ini=( ${ini[*]/%\\]/ \(} )    # convert text2function (1)
@@ -237,4 +237,3 @@ function run_ssh_minio2 {
     ssh -F "$SSHCONF_MINIO2" "$MINIO2" -- "$@" >> "$LOGFILE"
   fi
 }
-

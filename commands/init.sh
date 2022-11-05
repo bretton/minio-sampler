@@ -1199,7 +1199,7 @@ cat >site.yml<<"EOF"
     become_user: root
     shell:
       cmd: |
-        fetch -o /tmp/common.sh.in "https://raw.githubusercontent.com/bsdpot/pot/f033266a26ecd144dc047bb7f35929112407dfc0/share/pot/common.sh"
+        fetch -o /tmp/common.sh.in "https://raw.githubusercontent.com/bretton/minio-sampler/main/includes/pot_common.sh"
         cp -f /tmp/common.sh.in /usr/local/share/pot/common.sh
 
   - name: Setup pot.conf
