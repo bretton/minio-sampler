@@ -1,3 +1,10 @@
+0.107
+
+* Add working common.sh for pot
+* remove on pot version 0.15.4
+
+---
+
 0.106
 
 * New nextcloud version
