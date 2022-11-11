@@ -1,3 +1,10 @@
+0.109
+
+* Patch all pot scripts from master
+* Update pot image versions
+
+---
+
 0.108
 
 * Brain derp, fixed common.sh

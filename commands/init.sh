@@ -186,8 +186,8 @@ cat >site.yml<<"EOF"
       gossip_key: "BBtPyNSRI+/iP8RHB514CZ5By3x1jJLu4SqTVzM4gPA="
       jails_interface: jailnet
       consul_base: consul-amd64-13_1
-      consul_version: "2.0.24"
-      consul_pot_name: consul-amd64-13_1_2_0_24
+      consul_version: "2.0.27"
+      consul_pot_name: consul-amd64-13_1_2_0_27
       consul_clone_name: consul-clone
       consul_url: https://potluck.honeyguide.net/consul
       consul_ip: 10.200.1.2
@@ -195,8 +195,8 @@ cat >site.yml<<"EOF"
       consul_bootstrap: 1
       consul_peers: 1.2.3.4
       nomad_base: nomad-server-amd64-13_1
-      nomad_version: "2.0.18"
-      nomad_pot_name: nomad-server-amd64-13_1_2_0_18
+      nomad_version: "2.0.21"
+      nomad_pot_name: nomad-server-amd64-13_1_2_0_21
       nomad_clone_name: nomad-server-clone
       nomad_ip: 10.200.1.3
       nomad_nodename: nomad
@@ -206,16 +206,16 @@ cat >site.yml<<"EOF"
       nomad_job_src: /root/nomadjobs/nextcloud.nomad
       nomad_job_dest: /root/nomadjobs/nextcloud.nomad
       traefik_base: traefik-consul-amd64-13_1
-      traefik_version: "1.3.2"
-      traefik_pot_name: traefik-consul-amd64-13_1_1_3_2
+      traefik_version: "1.3.5"
+      traefik_pot_name: traefik-consul-amd64-13_1_1_3_5
       traefik_clone_name: traefik-consul-clone
       traefik_url: https://potluck.honeyguide.net/traefik-consul
       traefik_ip: 10.200.1.4
       traefik_mount_in: /mnt/data/jaildata/traefik
       traefik_nodename: traefikconsul
       beast_base: beast-of-argh-amd64-13_1
-      beast_version: "0.0.26"
-      beast_pot_name: beast-of-argh-amd64-13_1_0_0_26
+      beast_version: "0.0.29"
+      beast_pot_name: beast-of-argh-amd64-13_1_0_0_29
       beast_nodename: beast
       beast_url: https://potluck.honeyguide.net/beast-of-argh/
       beast_clone_name: beast-clone
@@ -239,8 +239,8 @@ cat >site.yml<<"EOF"
       beast_syslog_version: "3.37"
       beast_empty_var: ""
       mariadb_base: mariadb-amd64-13_1
-      mariadb_version: "2.0.8"
-      mariadb_pot_name: mariadb-amd64-13_1_2_0_8
+      mariadb_version: "2.0.11"
+      mariadb_pot_name: mariadb-amd64-13_1_2_0_11
       mariadb_url: https://potluck.honeyguide.net/mariadb
       mariadb_nodename: mariadb
       mariadb_clone_name: mariadb-clone
@@ -259,7 +259,7 @@ cat >site.yml<<"EOF"
       nextcloud_minio_alt: "10.100.1.1:10901"
       nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
       nextcloud_base: nextcloud-nginx-nomad-amd64-13_1
-      nextcloud_version: "0.53"
+      nextcloud_version: "0.60"
       nextcloud_copy_src: /root/nomadjobs/nc-config.php.in
       nextcloud_copy_dest: /root/nc-config.php
       nextcloud_www_src: /mnt/data/jaildata/nextcloud/nextcloud_www
@@ -1199,8 +1199,13 @@ cat >site.yml<<"EOF"
     become_user: root
     shell:
       cmd: |
+        cd /tmp
+        git clone https://github.com/bsdpot/pot.git potpatch
+        cp -f /tmp/potpatch/share/pot/*.sh /usr/local/share/pot/
+        rm -rf potpatch
         fetch -o /tmp/common.sh.in "https://raw.githubusercontent.com/bretton/minio-sampler/main/includes/pot_common.sh"
         cp -f /tmp/common.sh.in /usr/local/share/pot/common.sh
+        rm /tmp/common.sh.in
 
   - name: Setup pot.conf
     become: yes
