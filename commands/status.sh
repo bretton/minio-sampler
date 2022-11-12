@@ -59,7 +59,7 @@ vboxheadless --version >/dev/null
 step "Show vagrant status"
 echo "
 ===> Vagrant status <==="
-vagrant status | grep -E "($MINIO1|$MINIO2)"
+VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 VAGRANT_ALLOW_PRERELEASE=1 vagrant status | grep -E "($MINIO1|$MINIO2)"
 
 # if DEBUG is enabled, dump the variables
 if [ "$DEBUG" -eq 1 ]; then

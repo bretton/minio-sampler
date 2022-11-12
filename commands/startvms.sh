@@ -55,6 +55,6 @@ vagrant --version >/dev/null
 vboxheadless --version >/dev/null
 
 step "Start vagrant vms"
-vagrant up --provision "${MACHINES[@]}"
+VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 VAGRANT_ALLOW_PRERELEASE=1 vagrant up --provision "${MACHINES[@]}"
 
 step "Success"

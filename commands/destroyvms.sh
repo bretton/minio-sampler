@@ -54,6 +54,6 @@ vagrant --version >/dev/null
 vboxheadless --version >/dev/null
 
 step "Destroy vagrant vms"
-vagrant destroy -f "${MACHINES[@]}"
+VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 VAGRANT_ALLOW_PRERELEASE=1 vagrant destroy -f "${MACHINES[@]}"
 
 step "Success"

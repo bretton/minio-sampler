@@ -62,8 +62,8 @@ cd mysample
 minsampler packbox
 minsampler startvms
 
-  vagrant ssh minio1   
-  vagrant ssh minio2
+  VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 VAGRANT_ALLOW_PRERELEASE=1 vagrant ssh minio1   
+  VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 VAGRANT_ALLOW_PRERELEASE=1 vagrant ssh minio2
 ```
 
 ## Ubuntu 20.04 with Virtualbox
@@ -96,7 +96,7 @@ cd mysample
 minsampler packbox
 minsampler startvms
 
-  vagrant ssh minio1   
-  vagrant ssh minio2
+  VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 VAGRANT_ALLOW_PRERELEASE=1 vagrant ssh minio1   
+  VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 VAGRANT_ALLOW_PRERELEASE=1 vagrant ssh minio2
 ```
 

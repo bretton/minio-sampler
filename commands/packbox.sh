@@ -85,7 +85,8 @@ fi
 # packer build -only=virtualbox-iso -var-file=variables.json template.json
 
 step "Add Vagrant box"
-vagrant box add "builds/FreeBSD-${FREEBSD_VERSION}-RELEASE-amd64.box" \
+VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 VAGRANT_ALLOW_PRERELEASE=1 \
+  vagrant box add "builds/FreeBSD-${FREEBSD_VERSION}-RELEASE-amd64.box" \
   --name "FreeBSD-${FREEBSD_VERSION}-RELEASE-amd64"
 
 step "Success"

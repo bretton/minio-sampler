@@ -1,3 +1,10 @@
+0.110
+
+* Set vagrant variables to avoid dependency issues
+* VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 VAGRANT_ALLOW_PRERELEASE=1 on commands
+
+---
+
 0.109
 
 * Patch all pot scripts from master

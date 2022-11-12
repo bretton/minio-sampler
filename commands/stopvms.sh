@@ -55,6 +55,6 @@ vagrant --version >/dev/null
 vboxheadless --version >/dev/null
 
 step "Stop vagrant vms"
-vagrant halt "${MACHINES[@]}"
+VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 VAGRANT_ALLOW_PRERELEASE=1 vagrant halt "${MACHINES[@]}"
 
 step "Success"
