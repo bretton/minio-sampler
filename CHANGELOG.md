@@ -1,3 +1,10 @@
+0.113
+
+* Fix preparenextcloud.sh script
+* Update documentation to reflect manually running preparenextcloud.sh
+
+---
+
 0.112
 
 * Fix custom nextcloud config.php

@@ -255,6 +255,7 @@ cat >site.yml<<"EOF"
       mariadb_nc_db_name: nextcloud
       mariadb_nc_user: nextcloud
       mariadb_nc_pass: mynextcloud1345swdwfr3t34rw
+      mariadb_nc_proxy_port: "33306"
       nextcloud_minio: "10.100.1.3:9000"
       nextcloud_minio_alt: "10.100.1.1:10901"
       nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
@@ -270,6 +271,7 @@ cat >site.yml<<"EOF"
       nextcloud_rootca_dest: /root/rootca.crt
       nextcloud_admin_user: sampler
       nextcloud_admin_pass: sampler123
+      nextcloud_admin_email: "sampler@example.com"
 
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:
@@ -771,7 +773,7 @@ cat >site.yml<<"EOF"
             server {{ mariadb_ip }}:3306;
           }
           server {
-            listen 33306;
+            listen "{{ mariadb_nc_proxy_port }}";
             proxy_pass nextclouddb;
           }
         }
@@ -1491,6 +1493,7 @@ cat >site.yml<<"EOF"
             ),
           ),
           'datadirectory' => '{{ nextcloud_storage_dest }}',
+          'config_is_read_only' => true,
           'loglevel' => 1,
           'logfile' => '{{ nextcloud_storage_dest }}/nextcloud.log',
           'memcache.local' => '\OC\Memcache\APCu',
@@ -1811,13 +1814,18 @@ cat >site.yml<<"EOF"
       content: |
         #!/bin/sh
         idnextcloud=$(jls | grep nextcloud | cut -c 1-8 |sed 's/[[:blank:]]*$//')
+        jexec -U root "$idnextcloud" 'chmod 664 /usr/local/www/nextcloud/config/config.php'
         jexec -U root "$idnextcloud" su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:install \
-          --database "mysql" \
-          --database-name "{{ mariadb_nc_db_name }}" \
-          --database-user "{{ mariadb_nc_user }}" \
-          --database-pass "{{ mariadb_nc_pass }}" \
-          --admin-user "{{ nextcloud_admin_user }}" \
-          --admin-pass "{{ nextcloud_admin_pass }}"'
+          --database="mysql" \
+          --database-name="{{ mariadb_nc_db_name }}" \
+          --database-user="{{ mariadb_nc_user }}" \
+          --database-pass="{{ mariadb_nc_pass }}" \
+          --database-host="{{ minio_access_ip }}" \
+          --database-port="{{ mariadb_nc_proxy_port }}" \
+          --data-dir="{{ nextcloud_storage_dest }}" \
+          --admin-user="{{ nextcloud_admin_user }}" \
+          --admin-pass="{{ nextcloud_admin_pass }}" \
+          --admin-email="{{ nextcloud_admin_email }}"'
 
   - name: Set preparenextcloud.sh permissions
     ansible.builtin.file:
