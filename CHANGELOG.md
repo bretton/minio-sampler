@@ -1,3 +1,9 @@
+0.112
+
+* Fix custom nextcloud config.php
+
+---
+
 0.111
 
 * Update pot image versions

@@ -1467,7 +1467,6 @@ cat >site.yml<<"EOF"
         $CONFIG = array (
           'instanceid' => '',
           'passwordsalt' => '',
-          'secret' => '',
           'trusted_domains' =>
           array (
             0 => 'nextcloud.{{ minio1_hostname }}',
