@@ -1,3 +1,9 @@
+0.111
+
+* Update pot image versions
+
+---
+
 0.110
 
 * Set vagrant variables to avoid dependency issues
