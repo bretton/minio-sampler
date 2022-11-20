@@ -1,6 +1,7 @@
 0.114
 
 * Fixups to nextcloud config.php using input from sample file
+* Try using port 3306 instead of 33306
 
 ---
 

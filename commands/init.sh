@@ -255,7 +255,7 @@ cat >site.yml<<"EOF"
       mariadb_nc_db_name: nextcloud
       mariadb_nc_user: nextcloud
       mariadb_nc_pass: mynextcloud1345swdwfr3t34rw
-      mariadb_nc_proxy_port: "33306"
+      mariadb_nc_proxy_port: "3306"
       nextcloud_minio: "10.100.1.3:9000"
       nextcloud_minio_alt: "10.100.1.1:10901"
       nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
