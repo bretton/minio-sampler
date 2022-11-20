@@ -1467,8 +1467,6 @@ cat >site.yml<<"EOF"
       content: |
         <?php
         $CONFIG = array (
-          'instanceid' => '',
-          'passwordsalt' => '',
           'trusted_domains' =>
           array (
             0 => 'nextcloud.{{ minio1_hostname }}',
@@ -1505,7 +1503,7 @@ cat >site.yml<<"EOF"
           'version' => '23.0.5.1',
           'dbname' => '{{ mariadb_nc_db_name }}',
           'dbhost' => '{{ minio_access_ip }}',
-          'dbport' => '33306',
+          'dbport' => '{{ mariadb_nc_proxy_port }}',
           'dbtableprefix' => 'oc_',
           'dbuser' => '{{ mariadb_nc_user }}',
           'dbpassword' => '{{ mariadb_nc_pass }}',
@@ -1544,6 +1542,21 @@ cat >site.yml<<"EOF"
             1 => 'keeweb',
             2 => 'calendar',
           ),
+          'apps_paths' =>
+            array (
+              0 =>
+                array (
+                  'path' => '/usr/local/www/nextcloud/apps',
+                  'url' => '/apps',
+                  'writable' => true,
+                ),
+              1 =>
+                array (
+                 'path' => '/usr/local/www/nextcloud/apps-pkg',
+                 'url' => '/apps-pkg',
+                 'writable' => false,
+                ),
+            ),
         );
 
   - name: download the nextcloud pot image so it's already local
@@ -1814,7 +1827,6 @@ cat >site.yml<<"EOF"
       content: |
         #!/bin/sh
         idnextcloud=$(jls | grep nextcloud | cut -c 1-8 |sed 's/[[:blank:]]*$//')
-        jexec -U root "$idnextcloud" 'chmod 664 /usr/local/www/nextcloud/config/config.php'
         jexec -U root "$idnextcloud" su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:install \
           --database="mysql" \
           --database-name="{{ mariadb_nc_db_name }}" \
@@ -2442,10 +2454,8 @@ Vagrant.configure("2") do |config|
       vb.default_nic_type = "virtio"
     node.vm.network :forwarded_port, guest: 22, host_ip: "${NETWORK}.1", host: 12222, id: "minio1-ssh"
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${NETWORK}.1", host: 10901, id: "minio1-minio"
-    node.vm.network :forwarded_port, guest: 3306, host_ip: "${NETWORK}.1", host: 10910, id: "minio1-mysql"
     node.vm.network :forwarded_port, guest: 10443, host_ip: "${NETWORK}.1", host: 10906, id: "minio1-nextcloud"
     node.vm.network :forwarded_port, guest: 9000, host_ip: "${ACCESSIP}", host: 29000, id: "minio1-minio-public"
-    node.vm.network :forwarded_port, guest: 3306, host_ip: "${ACCESSIP}", host: 23306, id: "minio1-mysql-public"
     end
     node.vm.network :private_network, ip: "${NETWORK}.3", auto_config: false
     node.vm.network :public_network, ip: "${ACCESSIP}", auto_config: false

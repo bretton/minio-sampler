@@ -1,3 +1,9 @@
+0.114
+
+* Fixups to nextcloud config.php using input from sample file
+
+---
+
 0.113
 
 * Fix preparenextcloud.sh script
