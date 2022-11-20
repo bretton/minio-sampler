@@ -1,3 +1,10 @@
+0.115
+
+* Combine host:port for mysql server in nextcloud config.php
+* Eliminate dbport from config
+
+---
+
 0.114
 
 * Fixups to nextcloud config.php using input from sample file
