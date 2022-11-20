@@ -1500,7 +1500,7 @@ cat >site.yml<<"EOF"
           'overwritehost' => '',
           'overwriteprotocol' => 'https',
           'dbtype' => 'mysql',
-          'version' => '23.0.5.1',
+          'version' => '',
           'dbname' => '{{ mariadb_nc_db_name }}',
           'dbhost' => '{{ minio_access_ip }}:{{ mariadb_nc_proxy_port }}',
           'dbtableprefix' => 'oc_',
@@ -1801,7 +1801,7 @@ cat >site.yml<<"EOF"
         #!/bin/sh
         idmariadb=$(jls | grep {{ mariadb_clone_name }} | cut -c 1-8 | sed 's/[[:blank:]]*$//')
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "DROP DATABASE IF EXISTS {{ mariadb_nc_db_name }}"
-        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE DATABASE {{ mariadb_nc_db_name }}"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE DATABASE {{ mariadb_nc_db_name }} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER {{ mariadb_nc_user }}@'%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on {{ mariadb_nc_db_name }}.* to {{ mariadb_nc_user }}@'%'"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "FLUSH PRIVILEGES"
@@ -1827,16 +1827,16 @@ cat >site.yml<<"EOF"
         #!/bin/sh
         idnextcloud=$(jls | grep nextcloud | cut -c 1-8 |sed 's/[[:blank:]]*$//')
         jexec -U root "$idnextcloud" su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:install \
-          --database="mysql" \
-          --database-name="{{ mariadb_nc_db_name }}" \
-          --database-user="{{ mariadb_nc_user }}" \
-          --database-pass="{{ mariadb_nc_pass }}" \
-          --database-host="{{ minio_access_ip }}" \
-          --database-port="{{ mariadb_nc_proxy_port }}" \
-          --data-dir="{{ nextcloud_storage_dest }}" \
-          --admin-user="{{ nextcloud_admin_user }}" \
-          --admin-pass="{{ nextcloud_admin_pass }}" \
-          --admin-email="{{ nextcloud_admin_email }}"'
+          --database "mysql" \
+          --database-name "{{ mariadb_nc_db_name }}" \
+          --database-user "{{ mariadb_nc_user }}" \
+          --database-pass "{{ mariadb_nc_pass }}" \
+          --database-host "{{ minio_access_ip }}" \
+          --database-port "{{ mariadb_nc_proxy_port }}" \
+          --data-dir "{{ nextcloud_storage_dest }}" \
+          --admin-user "{{ nextcloud_admin_user }}" \
+          --admin-pass "{{ nextcloud_admin_pass }}" \
+          --admin-email "{{ nextcloud_admin_email }}"'
 
   - name: Set preparenextcloud.sh permissions
     ansible.builtin.file:
