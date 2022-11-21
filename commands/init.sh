@@ -262,11 +262,14 @@ cat >site.yml<<"EOF"
       nextcloud_base: nextcloud-nginx-nomad-amd64-13_1
       nextcloud_version: "0.60"
       nextcloud_copy_objectstore_src: /root/nomadjobs/objectstore.config.php
-      nextcloud_copy_objectstore_dest: /usr/local/www/nextcloud/config/objectstore.config.php
+      nextcloud_copy_objectstore_dest: /root/objectstore.config.php
+      nextcloud_copy_objectstore_final_dest: /usr/local/www/nextcloud/config/objectstore.config.php
       nextcloud_copy_mysql_src: /root/nomadjobs/mysql.config.php
-      nextcloud_copy_mysql_dest: /usr/local/www/nextcloud/config/mysql.config.php
+      nextcloud_copy_mysql_dest: /root/mysql.config.php
+      nextcloud_copy_mysql_final_dest: /usr/local/www/nextcloud/config/mysql.config.php
       nextcloud_copy_custom_src: /root/nomadjobs/custom.config.php
-      nextcloud_copy_custom_dest: /usr/local/www/nextcloud/config/custom.config.php
+      nextcloud_copy_custom_dest: /root/custom.config.php
+      nextcloud_copy_custom_final_dest: /usr/local/www/nextcloud/config/custom.config.php
       nextcloud_www_src: /mnt/data/jaildata/nextcloud/nextcloud_www
       nextcloud_www_dest: /usr/local/www/nextcloud
       nextcloud_storage_src: /mnt/data/jaildata/nextcloud/storage
