@@ -1,3 +1,9 @@
+0.117
+
+* Update nextcloud pot version
+
+---
+
 0.116
 
 * Fix logic for nextcloud installation

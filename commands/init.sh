@@ -260,16 +260,13 @@ cat >site.yml<<"EOF"
       nextcloud_minio_alt: "10.100.1.1:10901"
       nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
       nextcloud_base: nextcloud-nginx-nomad-amd64-13_1
-      nextcloud_version: "0.60"
+      nextcloud_version: "0.61"
       nextcloud_copy_objectstore_src: /root/nomadjobs/objectstore.config.php
       nextcloud_copy_objectstore_dest: /root/objectstore.config.php
-      nextcloud_copy_objectstore_final_dest: /usr/local/www/nextcloud/config/objectstore.config.php
       nextcloud_copy_mysql_src: /root/nomadjobs/mysql.config.php
       nextcloud_copy_mysql_dest: /root/mysql.config.php
-      nextcloud_copy_mysql_final_dest: /usr/local/www/nextcloud/config/mysql.config.php
       nextcloud_copy_custom_src: /root/nomadjobs/custom.config.php
       nextcloud_copy_custom_dest: /root/custom.config.php
-      nextcloud_copy_custom_final_dest: /usr/local/www/nextcloud/config/custom.config.php
       nextcloud_www_src: /mnt/data/jaildata/nextcloud/nextcloud_www
       nextcloud_www_dest: /usr/local/www/nextcloud
       nextcloud_storage_src: /mnt/data/jaildata/nextcloud/storage
@@ -1447,9 +1444,9 @@ cat >site.yml<<"EOF"
                 command = "/usr/local/bin/cook"
                 args = ["-d","{{ nextcloud_storage_dest }}","-s","{{ nextcloud_minio }}"]
                 copy = [
-                  "{{ nextcloud_copy_objectstore_dest }}:{{ nextcloud_copy_objectstore_final_dest }}",
-                  "{{ nextcloud_copy_mysql_dest }}:{{ nextcloud_copy_mysql_final_dest }}",
-                  "{{ nextcloud_copy_custom_dest }}:{{ nextcloud_copy_custom_final_dest }}",
+                  "{{ nextcloud_copy_objectstore_src }}:{{ nextcloud_copy_objectstore_dest }}",
+                  "{{ nextcloud_copy_mysql_src }}:{{ nextcloud_copy_mysql_dest }}",
+                  "{{ nextcloud_copy_custom_src }}:{{ nextcloud_copy_custom_dest }}",
                   "{{ nextcloud_rootca_src }}:{{ nextcloud_rootca_dest }}"
                 ]
                 mount = [
