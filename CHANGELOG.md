@@ -1,3 +1,10 @@
+0.116
+
+* Fix logic for nextcloud installation
+* Copy-in separate nextcloud config.php files
+
+---
+
 0.115
 
 * Combine host:port for mysql server in nextcloud config.php
