@@ -1,3 +1,10 @@
+0.118
+
+* Update nextcloud pot version
+* Fixups for various copied-in config files and preparenextcloud.sh script
+
+---
+
 0.117
 
 * Update nextcloud pot version

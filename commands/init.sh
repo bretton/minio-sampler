@@ -260,7 +260,7 @@ cat >site.yml<<"EOF"
       nextcloud_minio_alt: "10.100.1.1:10901"
       nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
       nextcloud_base: nextcloud-nginx-nomad-amd64-13_1
-      nextcloud_version: "0.61"
+      nextcloud_version: "0.62"
       nextcloud_copy_objectstore_src: /root/nomadjobs/objectstore.config.php
       nextcloud_copy_objectstore_dest: /root/objectstore.config.php
       nextcloud_copy_mysql_src: /root/nomadjobs/mysql.config.php
@@ -1505,7 +1505,6 @@ cat >site.yml<<"EOF"
           'dbtableprefix' => 'oc_',
           'dbuser' => '{{ mariadb_nc_user }}',
           'dbpassword' => '{{ mariadb_nc_pass }}',
-          ),
         );
 
   - name: Setup custom.config.php
@@ -1525,7 +1524,7 @@ cat >site.yml<<"EOF"
             4 => '{{ minio1_nomad_client_ip }}',
           ),
           'datadirectory' => '{{ nextcloud_storage_dest }}',
-          'config_is_read_only' => true,
+          'config_is_read_only' => false,
           'loglevel' => 1,
           'logfile' => '{{ nextcloud_storage_dest }}/nextcloud.log',
           'memcache.local' => '\OC\Memcache\APCu',
@@ -1836,7 +1835,7 @@ cat >site.yml<<"EOF"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "DROP DATABASE IF EXISTS {{ mariadb_nc_db_name }}"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE DATABASE {{ mariadb_nc_db_name }} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER {{ mariadb_nc_user }}@'%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
-        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on {{ mariadb_nc_db_name }}.* to {{ mariadb_nc_user }}@'%'"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL on {{ mariadb_nc_db_name }}.* to {{ mariadb_nc_user }}@'%'"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "FLUSH PRIVILEGES"
 
   - name: Set preparedatabase.sh permissions
@@ -1862,14 +1861,14 @@ cat >site.yml<<"EOF"
         jexec -U root "$idnextcloud" su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:install \
           --database "mysql" \
           --database-name "{{ mariadb_nc_db_name }}" \
-          --database-user "{{ mariadb_nc_user }}" \
-          --database-pass "{{ mariadb_nc_pass }}" \
           --database-host "{{ minio_access_ip }}" \
           --database-port "{{ mariadb_nc_proxy_port }}" \
-          --data-dir "{{ nextcloud_storage_dest }}" \
+          --database-user "{{ mariadb_nc_user }}" \
+          --database-pass "{{ mariadb_nc_pass }}" \
           --admin-user "{{ nextcloud_admin_user }}" \
           --admin-pass "{{ nextcloud_admin_pass }}" \
-          --admin-email "{{ nextcloud_admin_email }}"'
+          --admin-email "{{ nextcloud_admin_email }}" \
+          --data-dir "{{ nextcloud_storage_dest }}"'
 
   - name: Set preparenextcloud.sh permissions
     ansible.builtin.file:
