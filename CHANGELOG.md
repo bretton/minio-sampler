@@ -1,3 +1,9 @@
+0.119
+
+* Fix nginx proxy to nextcloud
+
+---
+
 0.118
 
 * Update nextcloud pot version

@@ -948,7 +948,7 @@ cat >site.yml<<"EOF"
               chunked_transfer_encoding off;
               proxy_buffering off;
               proxy_ssl_verify off;
-              proxy_pass https://{{ minio1_nomad_client_ip }}:10443;
+              proxy_pass http://{{ minio1_nomad_client_ip }}:10443;
             }
           }
         }
@@ -1835,7 +1835,7 @@ cat >site.yml<<"EOF"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "DROP DATABASE IF EXISTS {{ mariadb_nc_db_name }}"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE DATABASE {{ mariadb_nc_db_name }} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER {{ mariadb_nc_user }}@'%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
-        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL on {{ mariadb_nc_db_name }}.* to {{ mariadb_nc_user }}@'%'"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on {{ mariadb_nc_db_name }}.* to {{ mariadb_nc_user }}@'%'"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "FLUSH PRIVILEGES"
 
   - name: Set preparedatabase.sh permissions
@@ -1867,7 +1867,6 @@ cat >site.yml<<"EOF"
           --database-pass "{{ mariadb_nc_pass }}" \
           --admin-user "{{ nextcloud_admin_user }}" \
           --admin-pass "{{ nextcloud_admin_pass }}" \
-          --admin-email "{{ nextcloud_admin_email }}" \
           --data-dir "{{ nextcloud_storage_dest }}"'
 
   - name: Set preparenextcloud.sh permissions
