@@ -1505,6 +1505,7 @@ cat >site.yml<<"EOF"
           'dbtableprefix' => 'oc_',
           'dbuser' => '{{ mariadb_nc_user }}',
           'dbpassword' => '{{ mariadb_nc_pass }}',
+          'mysql.utf8mb4' => true,
         );
 
   - name: Setup custom.config.php
@@ -1555,7 +1556,7 @@ cat >site.yml<<"EOF"
           'ldapProviderFactory' => 'OCA\\User_LDAP\\LDAPProviderFactory',
           'encryption_skip_signature_check' => true,
           'encryption.key_storage_migrated' => false,
-          'mysql.utf8mb4' => true,
+          'allow_local_remote_servers' => true,
           'mail_sendmailmode' => 'smtp',
           'mail_smtpname' => 'nextcloud@{{ minio1_hostname }}',
           'mail_smtppassword' => '',
@@ -1835,7 +1836,7 @@ cat >site.yml<<"EOF"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "DROP DATABASE IF EXISTS {{ mariadb_nc_db_name }}"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE DATABASE {{ mariadb_nc_db_name }} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER {{ mariadb_nc_user }}@'%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
-        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on {{ mariadb_nc_db_name }}.* to {{ mariadb_nc_user }}@'%'"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on {{ mariadb_nc_db_name }}.* to {{ mariadb_nc_user }}@'%' WITH GRANT OPTION"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "FLUSH PRIVILEGES"
 
   - name: Set preparedatabase.sh permissions
@@ -1866,6 +1867,7 @@ cat >site.yml<<"EOF"
           --database-port "{{ mariadb_nc_proxy_port }}" \
           --database-user "{{ mariadb_nc_user }}" \
           --database-pass "{{ mariadb_nc_pass }}" \
+          --database-table-prefix "oc_" \
           --admin-user "{{ nextcloud_admin_user }}" \
           --admin-pass "{{ nextcloud_admin_pass }}" \
           --data-dir "{{ nextcloud_storage_dest }}"'
