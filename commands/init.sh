@@ -1867,7 +1867,7 @@ cat >site.yml<<"EOF"
           --database-port "{{ mariadb_nc_proxy_port }}" \
           --database-user "{{ mariadb_nc_user }}" \
           --database-pass "{{ mariadb_nc_pass }}" \
-          --database-table-prefix "oc_" \
+          --database-table-space "oc_" \
           --admin-user "{{ nextcloud_admin_user }}" \
           --admin-pass "{{ nextcloud_admin_pass }}" \
           --data-dir "{{ nextcloud_storage_dest }}"'
