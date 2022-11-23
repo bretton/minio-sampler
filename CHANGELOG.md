@@ -1,3 +1,9 @@
+0.120
+
+* Fix preparenextcloud.sh script
+
+---
+
 0.119
 
 * Fix nginx proxy to nextcloud

@@ -1858,7 +1858,8 @@ cat >site.yml<<"EOF"
       content: |
         #!/bin/sh
         idnextcloud=$(jls | grep nextcloud | cut -c 1-8 |sed 's/[[:blank:]]*$//')
-        jexec -U root "$idnextcloud" su -m www -c 'php /usr/local/www/nextcloud/occ maintenance:install \
+        jexec -U root "$idnextcloud" su -m www -c 'cd /usr/local/www/nextcloud/; \
+          php occ maintenance:install \
           --database "mysql" \
           --database-name "{{ mariadb_nc_db_name }}" \
           --database-host "{{ minio_access_ip }}" \
