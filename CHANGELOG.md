@@ -1,6 +1,6 @@
 0.122
 
-* pre-release version, nextcloud auto-install not working
+* Pre-release version, nextcloud auto-install not working
 
 ---
 
