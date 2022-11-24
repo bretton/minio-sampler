@@ -5,6 +5,8 @@ Do not run in production!
 
 This is a testing environment to show `minio` running on FreeBSD, with `consul`, `nomad`, and the Beast-of-Argh one-pot monitoring solution providing `prometheus`, `grafana`, `loki`, `alertmanager`, plus a `nextcloud` nomad image, configured to use `minio` S3 as file storage, and a `mariadb` pot image for the `nextcloud` database.
 
+As of 2022-11-24 everything works EXCEPT automatic nextcloud install. You can evaluate minio and the monitoring systems in the meantime.
+
 # Outline
 This will bring up 2 minio servers:
 * minio1 (8CPU, 8GB, 4 attached disks)
@@ -33,7 +35,7 @@ To create your own sampler, init the VMs:
       OR
       open http://ACCESSIP
       ...
-        ./preparenextcloud.sh
+        ./preparenextcloud.sh  # not working
     ...
     minsampler status
     ...
@@ -79,6 +81,8 @@ Please see [Detailed Install FreeBSD & Linux](DETAILED-INSTALL.md)
 
 A virtual interface is created with a free IP address from the LAN. You must provide this free IP address in `config.ini` in the `ACCESSIP` section.
 
+Everything is accessible via frontend at `http::/ACCESSIP`
+
 ### Disk Sizes
 
 Virtual disks are saved in the `minio-sampler` directory for the duration of running the program. 
@@ -97,9 +101,9 @@ A basic check is done to see if the input figures can be catered to, on running 
 
 ## Dashboards
 
-The default dashboard with links to all the included tools is `http://ACCESSIP`. There is a default index.html with links.
+The default dashboard with links to all the included tools is `http://ACCESSIP`. There is a default index pahe with links to the tools.
 
-Where `https` is applicable, please accept the self-signed certificate. You might need to do this twice, even refresh, to get the minio dashboard.
+Where `https` is applicable, please accept the self-signed certificate. You might need to do this twice, even refresh the page, to get the minio dashboard.
 
 ### Minio
 
@@ -144,3 +148,5 @@ The Traefik web interface is available nginx reverse proxy at `http://ACCESSIP:1
 There is a Nextcloud instance available at `https://ACCESSIP:10443`.
 
 The admin username is `sampler` and password `sampler123`.
+
+The automatic setup script is currently not working in this specialised setup.

@@ -1,3 +1,9 @@
+0.122
+
+* pre-release version, nextcloud auto-install not working
+
+---
+
 0.121
 
 * Experimenting with database setup for nextcloud

@@ -63,7 +63,7 @@ minsampler packbox
 minsampler startvms
 
   VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 VAGRANT_ALLOW_PRERELEASE=1 vagrant ssh minio1
-    ./preparenextcloud.sh
+    ./preparenextcloud.sh # not working
   VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 VAGRANT_ALLOW_PRERELEASE=1 vagrant ssh minio2
 ```
 
@@ -98,7 +98,7 @@ minsampler packbox
 minsampler startvms
 
   VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 VAGRANT_ALLOW_PRERELEASE=1 vagrant ssh minio1
-    ./preparenextcloud.sh
+    ./preparenextcloud.sh # not working
   VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 VAGRANT_ALLOW_PRERELEASE=1 vagrant ssh minio2
 ```
 
