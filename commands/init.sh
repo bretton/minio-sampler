@@ -1836,7 +1836,9 @@ cat >site.yml<<"EOF"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "DROP DATABASE IF EXISTS {{ mariadb_nc_db_name }}"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE DATABASE {{ mariadb_nc_db_name }} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER {{ mariadb_nc_user }}@'%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
-        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on *.* to {{ mariadb_nc_user }}@'%' WITH GRANT OPTION"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL on *.* to {{ mariadb_nc_user }}@'%' WITH GRANT OPTION"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER {{ mariadb_nc_user }}@'{{ mariadb_ip }}' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL on *.* to {{ mariadb_nc_user }}@'{{ mariadb_ip }}' WITH GRANT OPTION"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "FLUSH PRIVILEGES"
 
   - name: Set preparedatabase.sh permissions
