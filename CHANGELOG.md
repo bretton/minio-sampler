@@ -1,3 +1,9 @@
+0.123
+
+* Testing mysql user creation option
+
+---
+
 0.122
 
 * Pre-release version, nextcloud auto-install not working
