@@ -1,3 +1,9 @@
+0.125
+
+* Minor fixes
+
+---
+
 0.124
 
 * More experiments with mysql user creation

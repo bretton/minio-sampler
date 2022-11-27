@@ -1690,7 +1690,7 @@ cat >site.yml<<"EOF"
     ansible.builtin.file:
       path: "/usr/local/etc/nomad/client.hcl"
       mode: '0644'
-      owner: consul
+      owner: nomad
       group: wheel
 
   - name: Remove nomad server.hcl
