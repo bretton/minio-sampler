@@ -1,3 +1,9 @@
+0.127
+
+* Update nextcloud version
+
+---
+
 0.126
 
 * Enable filelocking setting for nextcloud
