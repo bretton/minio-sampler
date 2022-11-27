@@ -1529,7 +1529,7 @@ cat >site.yml<<"EOF"
           'loglevel' => 1,
           'logfile' => '{{ nextcloud_storage_dest }}/nextcloud.log',
           'memcache.local' => '\OC\Memcache\APCu',
-          'filelocking.enabled' => false,
+          'filelocking.enabled' => true,
           'overwrite.cli.url' => '',
           'overwritehost' => '',
           'overwriteprotocol' => 'https',

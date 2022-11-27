@@ -1,3 +1,9 @@
+0.126
+
+* Enable filelocking setting for nextcloud
+
+---
+
 0.125
 
 * Minor fixes
