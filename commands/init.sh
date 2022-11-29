@@ -772,15 +772,17 @@ cat >site.yml<<"EOF"
         events {
           worker_connections 4096;
         }
-        stream {
-          upstream nextclouddb {
-            server {{ mariadb_ip }}:3306;
-          }
-          server {
-            listen "{{ mariadb_nc_proxy_port }}";
-            proxy_pass nextclouddb;
-          }
-        }
+        # removing in favour of haproxy
+        # stream {
+        #   upstream nextclouddb {
+        #     server {{ mariadb_ip }}:3306;
+        #   }
+        #   server {
+        #     listen "{{ mariadb_nc_proxy_port }}" proxy_protocol;
+        #     proxy_pass nextclouddb;
+        #     proxy_protocol on;
+        #   }
+        # }
         http {
           include mime.types;
           default_type application/octet-stream;
@@ -1188,6 +1190,7 @@ cat >site.yml<<"EOF"
     ansible.builtin.package:
       name:
         - consul
+        - haproxy
         - nomad
         - nomad-pot-driver
         - node_exporter
@@ -1501,7 +1504,8 @@ cat >site.yml<<"EOF"
           'dbtype' => 'mysql',
           'version' => '',
           'dbname' => '{{ mariadb_nc_db_name }}',
-          'dbhost' => '{{ minio_access_ip }}:{{ mariadb_nc_proxy_port }}',
+          'dbhost' => '{{ minio_access_ip }}',
+          'dbport' => '{{ mariadb_nc_proxy_port }}',
           'dbtableprefix' => 'oc_',
           'dbuser' => '{{ mariadb_nc_user }}',
           'dbpassword' => '{{ mariadb_nc_pass }}',
@@ -1836,9 +1840,7 @@ cat >site.yml<<"EOF"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "DROP DATABASE IF EXISTS {{ mariadb_nc_db_name }}"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE DATABASE {{ mariadb_nc_db_name }} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER {{ mariadb_nc_user }}@'%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
-        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL on *.* to {{ mariadb_nc_user }}@'%' WITH GRANT OPTION"
-        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER {{ mariadb_nc_user }}@'{{ mariadb_ip }}' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
-        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL on *.* to {{ mariadb_nc_user }}@'{{ mariadb_ip }}' WITH GRANT OPTION"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on *.* to {{ mariadb_nc_user }}@'%' IDENTIFIED BY '{{ mariadb_nc_pass }}' WITH GRANT OPTION"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "FLUSH PRIVILEGES"
 
   - name: Set preparedatabase.sh permissions
@@ -1861,6 +1863,7 @@ cat >site.yml<<"EOF"
       content: |
         #!/bin/sh
         idnextcloud=$(jls | grep nextcloud | cut -c 1-8 |sed 's/[[:blank:]]*$//')
+        jexec -U root "$idnextcloud" rm -r /usr/local/www/nextcloud/config/config.php
         jexec -U root "$idnextcloud" su -m www -c 'cd /usr/local/www/nextcloud/; \
           php occ maintenance:install \
           --database "mysql" \
@@ -1880,6 +1883,62 @@ cat >site.yml<<"EOF"
       mode: '0755'
       owner: root
       group: wheel
+
+  - name: Install needed packages
+    become: yes
+    become_user: root
+    ansible.builtin.package:
+      name:
+        - haproxy
+      state: present
+
+  - name: Make haproxy directories
+    become: yes
+    become_user: root
+    shell:
+      cmd: |
+        mkdir -p /usr/local/etc/haproxy
+        mkdir -p /var/run/haproxy
+
+  - name: Add haproxy.conf
+    become: yes
+    become_user: root
+    copy:
+      dest: /usr/local/etc/haproxy/haproxy.conf
+      content: |
+        global
+          daemon
+          user www
+          group www
+          stats socket /var/run/haproxy/socket mode 600 level admin expose-fd listeners
+
+        defaults
+          retries 3
+          option redispatch
+          timeout connect 5000ms
+          timeout client 50000ms
+          timeout server 50000ms
+
+        listen mysql
+          bind {{ minio_access_ip }}:{{ mariadb_nc_proxy_port }}
+          mode tcp
+          option tcpka
+          server mariadb {{ mariadb_ip }}:{{ mariadb_nc_proxy_port }}
+
+  - name: Configure haproxy start
+    become: yes
+    become_user: root
+    shell:
+      cmd: |
+        sysrc haproxy_config=/usr/local/etc/haproxy/haproxy.conf
+        service haproxy enable
+
+  - name: Start haproxy
+    become: yes
+    become_user: root
+    ansible.builtin.service:
+      name: haproxy
+      state: started
 
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:

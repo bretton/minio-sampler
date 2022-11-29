@@ -1,3 +1,9 @@
+0.129
+
+* Using haproxy instead of nginx to proxy mariadb
+
+---
+
 0.128
 
 * Update nextcloud version again
