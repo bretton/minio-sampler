@@ -1,3 +1,10 @@
+0.130
+
+* Change IP for haproxy to mariadb
+* Adjust database users
+
+---
+
 0.129
 
 * Using haproxy instead of nginx to proxy mariadb

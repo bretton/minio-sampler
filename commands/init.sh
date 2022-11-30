@@ -1504,7 +1504,7 @@ cat >site.yml<<"EOF"
           'dbtype' => 'mysql',
           'version' => '',
           'dbname' => '{{ mariadb_nc_db_name }}',
-          'dbhost' => '{{ minio_access_ip }}',
+          'dbhost' => '{{ minio1_ip_address }}',
           'dbport' => '{{ mariadb_nc_proxy_port }}',
           'dbtableprefix' => 'oc_',
           'dbuser' => '{{ mariadb_nc_user }}',
@@ -1839,6 +1839,8 @@ cat >site.yml<<"EOF"
         idmariadb=$(jls | grep {{ mariadb_clone_name }} | cut -c 1-8 | sed 's/[[:blank:]]*$//')
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "DROP DATABASE IF EXISTS {{ mariadb_nc_db_name }}"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE DATABASE {{ mariadb_nc_db_name }} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER {{ mariadb_nc_user }}@'localhost' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
+        jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on *.* to {{ mariadb_nc_user }}@'localhost' IDENTIFIED BY '{{ mariadb_nc_pass }}' WITH GRANT OPTION"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "CREATE USER {{ mariadb_nc_user }}@'%' IDENTIFIED BY '{{ mariadb_nc_pass }}'"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "GRANT ALL PRIVILEGES on *.* to {{ mariadb_nc_user }}@'%' IDENTIFIED BY '{{ mariadb_nc_pass }}' WITH GRANT OPTION"
         jexec -U root "$idmariadb" /usr/local/bin/mysql -sfu root -e "FLUSH PRIVILEGES"
@@ -1868,7 +1870,7 @@ cat >site.yml<<"EOF"
           php occ maintenance:install \
           --database "mysql" \
           --database-name "{{ mariadb_nc_db_name }}" \
-          --database-host "{{ minio_access_ip }}" \
+          --database-host "{{ minio1_ip_address }}" \
           --database-port "{{ mariadb_nc_proxy_port }}" \
           --database-user "{{ mariadb_nc_user }}" \
           --database-pass "{{ mariadb_nc_pass }}" \
@@ -1915,14 +1917,15 @@ cat >site.yml<<"EOF"
         defaults
           retries 3
           option redispatch
-          timeout connect 5000ms
-          timeout client 50000ms
-          timeout server 50000ms
+          option tcplog
+          timeout connect 10000ms
+          timeout client 100000ms
+          timeout server 100000ms
 
         listen mysql
-          bind {{ minio_access_ip }}:{{ mariadb_nc_proxy_port }}
+          #bind {{ minio_access_ip }}:{{ mariadb_nc_proxy_port }}
+          bind {{ minio1_ip_address }}:{{ mariadb_nc_proxy_port }}
           mode tcp
-          option tcpka
           server mariadb {{ mariadb_ip }}:{{ mariadb_nc_proxy_port }}
 
   - name: Configure haproxy start
