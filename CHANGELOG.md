@@ -1,3 +1,9 @@
+0.131
+
+* Update nextcloud version, now using non-layered image with latest package sources
+
+---
+
 0.130
 
 * Change IP for haproxy to mariadb

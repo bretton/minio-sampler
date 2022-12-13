@@ -276,6 +276,7 @@ cat >site.yml<<"EOF"
       nextcloud_admin_user: sampler
       nextcloud_admin_pass: sampler123
       nextcloud_admin_email: "sampler@example.com"
+      nextcloud_custom_version: '25.0.1.1'
 
   - name: Wait for port 22 to become open, wait for 2 seconds
     wait_for:
@@ -1502,7 +1503,7 @@ cat >site.yml<<"EOF"
         <?php
         $CONFIG = array (
           'dbtype' => 'mysql',
-          'version' => '',
+          'version' => '{{ nextcloud_custom_version }}',
           'dbname' => '{{ mariadb_nc_db_name }}',
           'dbhost' => '{{ minio1_ip_address }}',
           'dbport' => '{{ mariadb_nc_proxy_port }}',
