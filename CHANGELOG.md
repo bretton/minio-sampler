@@ -1,3 +1,10 @@
+0.132
+
+* Fix ansible labelling
+* Add back vagrant disksize plugin because disk too small
+
+---
+
 0.131
 
 * Update nextcloud version, now using non-layered image with latest package sources

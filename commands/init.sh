@@ -1961,7 +1961,7 @@ cat >site.yml<<"EOF"
       port: 22
       delay: 2
 
-  - name: setup and start the mariadb pot image
+  - name: setup and start the beast of argh pot image
     become: yes
     become_user: root
     shell:
@@ -2525,6 +2525,7 @@ Vagrant.configure("2") do |config|
     node.vm.communicator = "ssh"
     node.ssh.connect_timeout = 60
     node.ssh.keep_alive = true
+    node.disksize.size = '32GB'
     node.vm.provider "virtualbox" do |vb|
       vb.memory = "8192"
       vb.cpus = "8"
