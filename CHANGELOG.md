@@ -1,3 +1,9 @@
+0.136
+
+* Automatically grow disk on first boot added in
+
+---
+
 0.135
 
 * Updating ERRATA file

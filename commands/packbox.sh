@@ -67,6 +67,15 @@ rm -rf _build/packer
 git clone -b testing https://github.com/bretton/packer-FreeBSD.git _build/packer
 cd _build/packer
 
+# need this to expand disk size, was turned off in custom packer script for another system
+{
+  printf "\n# Enable resource limits\n"
+  printf "echo kern.racct.enable=1 >>/boot/loader.conf\n"
+  printf "\n# Growfs on first boot\n"
+  printf "service growfs enable\n"
+  printf "touch /firstboot\n"
+} >>scripts/cleanup.sh
+
 # future-proofing but simply replaces 13.1 with 13.1 currently, increases disk size
 <variables.json.sample sed -e "s|13.1|${FREEBSD_VERSION}|g" -e "s|32G|40960|g" >variables.json
 #<variables.json.sample sed -e "s|13.0|${FREEBSD_VERSION}|g" -e "s|32G|10240|g" >variables.json
