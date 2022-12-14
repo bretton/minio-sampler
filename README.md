@@ -26,7 +26,7 @@ To create your own sampler, init the VMs:
       (edit) config.ini and set ACCESSIP to a free IP on LAN, and set DISKSIZE
 
     export PATH=$(pwd)/bin:$PATH
-    (optional: sudo chmod 775 /tmp)
+    (optional: sudo chmod 777 /tmp)
     minsampler init mysample
     cd mysample
     minsampler packbox
