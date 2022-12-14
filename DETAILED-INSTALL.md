@@ -56,7 +56,7 @@ cd minio-sampler
   (edit) config.ini and set ACCESSIP to a free IP on LAN, and set DISKSIZE
 
 export PATH=$(pwd)/bin:$PATH
-(optional: sudo chmod 775 /tmp)
+(optional: sudo chmod 777 /tmp else packer error)
 minsampler init mysample
 cd mysample
 minsampler packbox
