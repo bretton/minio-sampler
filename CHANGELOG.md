@@ -1,3 +1,9 @@
+0.135
+
+* Updating ERRATA file
+
+---
+
 0.134
 
 * Set packer log path
