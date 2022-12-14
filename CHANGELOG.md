@@ -1,3 +1,9 @@
+0.133
+
+* Fix detailed documentation
+
+---
+
 0.132
 
 * Fix ansible labelling

@@ -57,7 +57,7 @@ cd minio-sampler
 
 export PATH=$(pwd)/bin:$PATH
 (optional: sudo chmod 775 /tmp)
-minsampler init -v mysample
+minsampler init mysample
 cd mysample
 minsampler packbox
 minsampler startvms
@@ -92,7 +92,7 @@ cd minio-sampler
   (edit) config.ini and set ACCESSIP to a free IP on LAN, and set DISKSIZE
 
 export PATH=$(pwd)/bin:$PATH
-minsampler init -v mysample
+minsampler init mysample
 cd mysample
 minsampler packbox
 minsampler startvms
