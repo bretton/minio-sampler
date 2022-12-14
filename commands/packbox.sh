@@ -69,8 +69,6 @@ cd _build/packer
 
 # need this to expand disk size, was turned off in custom packer script for another system
 {
-  printf "\n# Enable resource limits\n"
-  printf "echo kern.racct.enable=1 >>/boot/loader.conf\n"
   printf "\n# Growfs on first boot\n"
   printf "service growfs enable\n"
   printf "touch /firstboot\n"
