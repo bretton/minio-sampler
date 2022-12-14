@@ -1,3 +1,9 @@
+0.137
+
+* New version nextcloud nomad image
+
+---
+
 0.136
 
 * Automatically grow disk on first boot added in

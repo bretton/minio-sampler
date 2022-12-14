@@ -260,7 +260,7 @@ cat >site.yml<<"EOF"
       nextcloud_minio_alt: "10.100.1.1:10901"
       nextcloud_url: https://potluck.honeyguide.net/nextcloud-nginx-nomad
       nextcloud_base: nextcloud-nginx-nomad-amd64-13_1
-      nextcloud_version: "0.64"
+      nextcloud_version: "0.67"
       nextcloud_copy_objectstore_src: /root/nomadjobs/objectstore.config.php
       nextcloud_copy_objectstore_dest: /root/objectstore.config.php
       nextcloud_copy_mysql_src: /root/nomadjobs/mysql.config.php
