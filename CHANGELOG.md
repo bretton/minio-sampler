@@ -1,3 +1,9 @@
+0.134
+
+* Set packer log path
+
+---
+
 0.133
 
 * Fix detailed documentation

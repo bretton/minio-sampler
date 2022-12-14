@@ -78,6 +78,7 @@ cd _build/packer
 step "Packer build"
 # debug
 export PACKER_LOG=1
+export PACKER_LOG_PATH="packer.log"
 export PACKER_BUILDER_TYPE="virtualbox-iso"
 if [ -f variables.json ]; then
     packer build -only="virtualbox-iso" -var-file="variables.json" template.json
