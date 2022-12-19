@@ -1,3 +1,9 @@
+0.138
+
+* Include link to blog post
+
+---
+
 0.137
 
 * New version nextcloud nomad image
