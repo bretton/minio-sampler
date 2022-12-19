@@ -1,7 +1,7 @@
 # Introduction
 `minio-sampler` (aka `minsampler`) borrows heavily from [potman](https://github.com/bsdpot/potman), [minio-incinerator](https://github.com/bretton/minio-incinerator/), `clusterfurnace` and `cephsmelter` to build a virtualbox minio cluster .
 
-It is a sampler environment matching the HOWTO at [https://honeyguide.eu/posts/minio-beast-nextcloud/](How To Set Up a Minio Cluster From Potluck, Complete With Nextcloud, Monitoring And Alerting).
+It is a sampler environment matching the HOWTO at [How To Set Up a Minio Cluster From Potluck, Complete With Nextcloud, Monitoring And Alerting](https://honeyguide.eu/posts/minio-beast-nextcloud/).
 
 Do not run in production! 
 
