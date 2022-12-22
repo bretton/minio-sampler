@@ -3,6 +3,8 @@
 
 It is a sampler environment matching the HOWTO at [How To Set Up a Minio Cluster From Potluck, Complete With Nextcloud, Monitoring And Alerting](https://honeyguide.eu/posts/minio-beast-nextcloud/).
 
+This repo has moved to [here](https://github.com/hnygd/minio-sampler).
+
 Do not run in production! 
 
 This is a testing environment to show `minio` running on FreeBSD, with `consul`, `nomad`, and the Beast-of-Argh one-pot monitoring solution providing `prometheus`, `grafana`, `loki`, `alertmanager`, plus a `nextcloud` nomad image, configured to use `minio` S3 as file storage, and a `mariadb` pot image for the `nextcloud` database.
